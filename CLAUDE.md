@@ -134,3 +134,4 @@ src/
 - Prefer explicit error handling with detailed error messages
 - Use discriminated unions for GitHub context types
 - Implement retry logic for GitHub API operations via `utils/retry.ts`
+- critical do all tests on this project : limam/unity-simple-project

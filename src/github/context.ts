@@ -128,7 +128,7 @@ export function parseGitHubContext(): GitHubContext {
   const context = github.context;
 
   const commonFields = {
-    runId: process.env.GITHUB_RUN_ID!,
+    runId: process.env.GITHUB_RUN_NUMBER || process.env.GITHUB_RUN_ID!,
     eventAction: context.payload.action,
     repository: {
       owner: context.repo.owner,
