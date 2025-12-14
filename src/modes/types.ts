@@ -1,7 +1,7 @@
 import type { GitHubContext } from "../github/context";
 import type { PreparedContext } from "../create-prompt/types";
 import type { FetchDataResult } from "../github/data/fetcher";
-import type { Octokits } from "../github/api/client";
+import type { Octokits, GiteaClient } from "../github/api/client";
 
 export type ModeName = "tag" | "agent";
 
@@ -86,6 +86,7 @@ export type Mode = {
 export type ModeOptions = {
   context: GitHubContext;
   octokit: Octokits;
+  giteaClient: GiteaClient;
   githubToken: string;
 };
 

@@ -6,9 +6,9 @@
  */
 
 import * as core from "@actions/core";
-import { setupGitHubToken } from "../github/token";
+import { setupGiteaToken } from "../github/token";
 import { checkWritePermissions } from "../github/validation/permissions";
-import { createOctokit } from "../github/api/client";
+import { createOctokit, createGiteaClient } from "../github/api/client";
 import { parseGitHubContext, isEntityContext } from "../github/context";
 import { getMode } from "../modes/registry";
 import { prepare } from "../prepare";
@@ -24,19 +24,20 @@ async function run() {
     // Auto-detect mode based on context
     const mode = getMode(context);
 
-    // Setup GitHub token
-    const githubToken = await setupGitHubToken();
-    const octokit = createOctokit(githubToken);
+    // Setup Gitea token
+    const giteaToken = await setupGiteaToken();
+    const octokit = createOctokit(giteaToken);
+    const giteaClient = createGiteaClient(giteaToken);
 
     // Step 3: Check write permissions (only for entity contexts)
     if (isEntityContext(context)) {
-      // Check if github_token was provided as input (not from app)
-      const githubTokenProvided = !!process.env.OVERRIDE_GITHUB_TOKEN;
+      // Check if gitea_token was provided as input
+      const giteaTokenProvided = !!process.env.OVERRIDE_GITEA_TOKEN;
       const hasWritePermissions = await checkWritePermissions(
         octokit.rest,
         context,
         context.inputs.allowedNonWriteUsers,
-        githubTokenProvided,
+        giteaTokenProvided,
       );
       if (!hasWritePermissions) {
         throw new Error(
@@ -59,7 +60,7 @@ async function run() {
     if (!containsTrigger) {
       console.log("No trigger found, skipping remaining steps");
       // Still set github_token output even when skipping
-      core.setOutput("github_token", githubToken);
+      core.setOutput("github_token", giteaToken);
       return;
     }
 
@@ -67,14 +68,15 @@ async function run() {
     const result = await prepare({
       context,
       octokit,
+      giteaClient,
       mode,
-      githubToken,
+      githubToken: giteaToken,
     });
 
     // MCP config is handled by individual modes (tag/agent) and included in their claude_args output
 
-    // Expose the GitHub token (Claude App token) as an output
-    core.setOutput("github_token", githubToken);
+    // Expose the Gitea token as an output
+    core.setOutput("github_token", giteaToken);
 
     // Step 6: Get system prompt from mode if available
     if (mode.getSystemPrompt) {

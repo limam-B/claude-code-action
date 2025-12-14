@@ -1,0 +1,36 @@
+name: Test Claude Code Action (Gitea)
+
+on:
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+jobs:
+  claude-respond:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Claude Code Action
+        uses: ./ # Uses the local action in this repo
+        with:
+          # Gitea token - you need to add this as a secret in Gitea
+          gitea_token: ${{ secrets.REPO_ACCESS_TOKEN }}
+
+          # Claude Code OAuth token (from your Claude Max subscription)
+          claude_code_oauth_token: ${{ secrets.CLAUDE_OAUTH_TOKEN }}
+
+          # Trigger phrase (default is @claude)
+          trigger_phrase: "@claude"
+
+          # Optional: Set Gitea API URL if not default
+          # Leave commented if using http://localhost:3000
+          # GITEA_API_URL will be read from environment
+        env:
+          # Set Gitea API URL (uncomment and adjust if needed)
+          GITEA_API_URL: "http://localhost:3000/api/v1"
+          GITEA_SERVER_URL: "http://localhost:3000"
