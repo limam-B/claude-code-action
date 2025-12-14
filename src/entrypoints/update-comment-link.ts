@@ -44,7 +44,9 @@ async function run() {
     try {
       // Gitea uses the same API for all comment types (issue comments)
       console.log(`Fetching issue comment ${commentId}`);
-      comment = await giteaClient.get(`/repos/${owner}/${repo}/issues/comments/${commentId}`);
+      comment = await giteaClient.get(
+        `/repos/${owner}/${repo}/issues/comments/${commentId}`,
+      );
       isPRReviewComment = false;
       console.log("Successfully fetched comment");
     } catch (finalError) {
@@ -57,7 +59,9 @@ async function run() {
 
       // Try to get the PR info to understand the comment structure
       try {
-        const pr = await giteaClient.get(`/repos/${owner}/${repo}/pulls/${context.entityNumber}`);
+        const pr = await giteaClient.get(
+          `/repos/${owner}/${repo}/pulls/${context.entityNumber}`,
+        );
         console.log(`PR state: ${pr.state}`);
       } catch {
         console.error("Could not fetch PR info for debugging");
@@ -94,7 +98,9 @@ async function run() {
       if (!containsPRUrl) {
         // Check if there are changes to the branch compared to the default branch
         try {
-          const comparison = await giteaClient.get(`/repos/${owner}/${repo}/compare/${baseBranch}...${claudeBranch}`);
+          const comparison = await giteaClient.get(
+            `/repos/${owner}/${repo}/compare/${baseBranch}...${claudeBranch}`,
+          );
 
           // If there are changes (commits or file changes), add the PR URL
           if (

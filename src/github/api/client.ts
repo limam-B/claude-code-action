@@ -18,14 +18,17 @@ export type GiteaClient = {
 export function createGiteaClient(token: string): GiteaClient {
   const baseUrl = GITEA_API_URL;
 
-  const fetchApi = async (path: string, options: RequestInit = {}): Promise<Response> => {
+  const fetchApi = async (
+    path: string,
+    options: RequestInit = {},
+  ): Promise<Response> => {
     const url = `${baseUrl}${path}`;
     const response = await fetch(url, {
       ...options,
       headers: {
         ...options.headers,
-        'Authorization': `token ${token}`,
-        'Content-Type': 'application/json',
+        Authorization: `token ${token}`,
+        "Content-Type": "application/json",
       },
     });
 
@@ -43,13 +46,13 @@ export function createGiteaClient(token: string): GiteaClient {
     fetch: fetchApi,
 
     async get<T = any>(path: string): Promise<T> {
-      const response = await fetchApi(path, { method: 'GET' });
+      const response = await fetchApi(path, { method: "GET" });
       return response.json() as Promise<T>;
     },
 
     async post<T = any>(path: string, body?: any): Promise<T> {
       const response = await fetchApi(path, {
-        method: 'POST',
+        method: "POST",
         body: body ? JSON.stringify(body) : undefined,
       });
       return response.json() as Promise<T>;
@@ -57,14 +60,14 @@ export function createGiteaClient(token: string): GiteaClient {
 
     async patch<T = any>(path: string, body?: any): Promise<T> {
       const response = await fetchApi(path, {
-        method: 'PATCH',
+        method: "PATCH",
         body: body ? JSON.stringify(body) : undefined,
       });
       return response.json() as Promise<T>;
     },
 
     async delete(path: string): Promise<void> {
-      await fetchApi(path, { method: 'DELETE' });
+      await fetchApi(path, { method: "DELETE" });
     },
   };
 }

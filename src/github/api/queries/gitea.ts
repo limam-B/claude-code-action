@@ -10,7 +10,7 @@ export async function fetchPullRequest(
   client: GiteaClient,
   owner: string,
   repo: string,
-  index: number
+  index: number,
 ) {
   return client.get(`/repos/${owner}/${repo}/pulls/${index}`);
 }
@@ -22,7 +22,7 @@ export async function fetchIssue(
   client: GiteaClient,
   owner: string,
   repo: string,
-  index: number
+  index: number,
 ) {
   return client.get(`/repos/${owner}/${repo}/issues/${index}`);
 }
@@ -35,7 +35,7 @@ export async function fetchIssueComments(
   client: GiteaClient,
   owner: string,
   repo: string,
-  index: number
+  index: number,
 ) {
   return client.get(`/repos/${owner}/${repo}/issues/${index}/comments`);
 }
@@ -47,7 +47,7 @@ export async function fetchPullRequestFiles(
   client: GiteaClient,
   owner: string,
   repo: string,
-  index: number
+  index: number,
 ) {
   return client.get(`/repos/${owner}/${repo}/pulls/${index}/files`);
 }
@@ -58,7 +58,7 @@ export async function fetchPullRequestFiles(
 export async function fetchRepository(
   client: GiteaClient,
   owner: string,
-  repo: string
+  repo: string,
 ) {
   return client.get(`/repos/${owner}/${repo}`);
 }
@@ -70,12 +70,14 @@ export async function fetchBranch(
   client: GiteaClient,
   owner: string,
   repo: string,
-  branch: string
+  branch: string,
 ) {
-  const data = await client.get<any>(`/repos/${owner}/${repo}/branches/${branch}`);
+  const data = await client.get<any>(
+    `/repos/${owner}/${repo}/branches/${branch}`,
+  );
 
   // Map Gitea's commit.id to commit.sha for compatibility
-  if (data.commit && data.commit.id && !data.commit.sha) {
+  if (data.commit && data.commit.id) {
     data.commit.sha = data.commit.id;
   }
 
@@ -90,9 +92,11 @@ export async function createComment(
   owner: string,
   repo: string,
   index: number,
-  body: string
+  body: string,
 ) {
-  return client.post(`/repos/${owner}/${repo}/issues/${index}/comments`, { body });
+  return client.post(`/repos/${owner}/${repo}/issues/${index}/comments`, {
+    body,
+  });
 }
 
 /**
@@ -103,17 +107,16 @@ export async function updateComment(
   owner: string,
   repo: string,
   commentId: number,
-  body: string
+  body: string,
 ) {
-  return client.patch(`/repos/${owner}/${repo}/issues/comments/${commentId}`, { body });
+  return client.patch(`/repos/${owner}/${repo}/issues/comments/${commentId}`, {
+    body,
+  });
 }
 
 /**
  * Get user details
  */
-export async function fetchUser(
-  client: GiteaClient,
-  username: string
-) {
+export async function fetchUser(client: GiteaClient, username: string) {
   return client.get(`/users/${username}`);
 }

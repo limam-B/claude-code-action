@@ -9,10 +9,10 @@
 
 import type { ParsedGitHubContext } from "../context";
 
-export async function checkHumanActor(
-  githubContext: ParsedGitHubContext,
-) {
-  console.log(`Gitea mode: Skipping human actor check for: ${githubContext.actor}`);
+export async function checkHumanActor(githubContext: ParsedGitHubContext) {
+  console.log(
+    `Gitea mode: Skipping human actor check for: ${githubContext.actor}`,
+  );
   console.log(`Single-user local setup - all actors allowed`);
 
   // In Gitea local setup, skip validation

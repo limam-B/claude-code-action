@@ -1,6 +1,11 @@
 import { execFileSync } from "child_process";
 import type { GiteaClient } from "../api/client";
-import { fetchPullRequest, fetchIssue, fetchIssueComments, fetchPullRequestFiles } from "../api/queries/gitea";
+import {
+  fetchPullRequest,
+  fetchIssue,
+  fetchIssueComments,
+  fetchPullRequestFiles,
+} from "../api/queries/gitea";
 import {
   isIssueCommentEvent,
   isPullRequestReviewEvent,
@@ -183,9 +188,24 @@ export async function fetchGitHubData({
   try {
     if (isPR) {
       // Fetch PR data using Gitea REST API
-      const pr = await fetchPullRequest(giteaClient, owner, repo, parseInt(prNumber));
-      const prComments = await fetchIssueComments(giteaClient, owner, repo, parseInt(prNumber));
-      const prFiles = await fetchPullRequestFiles(giteaClient, owner, repo, parseInt(prNumber));
+      const pr = await fetchPullRequest(
+        giteaClient,
+        owner,
+        repo,
+        parseInt(prNumber),
+      );
+      const prComments = await fetchIssueComments(
+        giteaClient,
+        owner,
+        repo,
+        parseInt(prNumber),
+      );
+      const prFiles = await fetchPullRequestFiles(
+        giteaClient,
+        owner,
+        repo,
+        parseInt(prNumber),
+      );
 
       // Transform Gitea PR response to match GitHub GraphQL structure
       contextData = {
@@ -214,7 +234,14 @@ export async function fetchGitHubData({
             path: f.filename,
             additions: f.additions,
             deletions: f.deletions,
-            changeType: f.status === "added" ? "ADDED" : f.status === "removed" ? "DELETED" : f.status === "modified" ? "MODIFIED" : "MODIFIED",
+            changeType:
+              f.status === "added"
+                ? "ADDED"
+                : f.status === "removed"
+                  ? "DELETED"
+                  : f.status === "modified"
+                    ? "MODIFIED"
+                    : "MODIFIED",
           })),
         },
       } as GitHubPullRequest;
@@ -229,8 +256,18 @@ export async function fetchGitHubData({
       console.log(`Successfully fetched PR #${prNumber} data`);
     } else {
       // Fetch issue data using Gitea REST API
-      const issue = await fetchIssue(giteaClient, owner, repo, parseInt(prNumber));
-      const issueComments = await fetchIssueComments(giteaClient, owner, repo, parseInt(prNumber));
+      const issue = await fetchIssue(
+        giteaClient,
+        owner,
+        repo,
+        parseInt(prNumber),
+      );
+      const issueComments = await fetchIssueComments(
+        giteaClient,
+        owner,
+        repo,
+        parseInt(prNumber),
+      );
 
       // Transform Gitea issue response to match GitHub GraphQL structure
       contextData = {
@@ -385,7 +422,10 @@ export async function fetchGitHubData({
   // Fetch trigger user display name if username is provided
   let triggerDisplayName: string | null | undefined;
   if (triggerUsername) {
-    triggerDisplayName = await fetchUserDisplayName(giteaClient, triggerUsername);
+    triggerDisplayName = await fetchUserDisplayName(
+      giteaClient,
+      triggerUsername,
+    );
   }
 
   return {

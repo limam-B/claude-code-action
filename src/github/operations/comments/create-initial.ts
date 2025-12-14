@@ -33,7 +33,9 @@ export async function createInitialComment(
       context.isPR &&
       isPullRequestEvent(context)
     ) {
-      const comments = await giteaClient.get<any[]>(`/repos/${owner}/${repo}/issues/${context.entityNumber}/comments`);
+      const comments = await giteaClient.get<any[]>(
+        `/repos/${owner}/${repo}/issues/${context.entityNumber}/comments`,
+      );
       const existingComment = comments.find((comment) => {
         const idMatch = comment.user?.id === CLAUDE_APP_BOT_ID;
         const botNameMatch =
@@ -44,25 +46,37 @@ export async function createInitialComment(
         return idMatch || botNameMatch || bodyMatch;
       });
       if (existingComment) {
-        response = await giteaClient.patch(`/repos/${owner}/${repo}/issues/comments/${existingComment.id}`, {
-          body: initialBody,
-        });
+        response = await giteaClient.patch(
+          `/repos/${owner}/${repo}/issues/comments/${existingComment.id}`,
+          {
+            body: initialBody,
+          },
+        );
       } else {
         // Create new comment if no existing one found
-        response = await giteaClient.post(`/repos/${owner}/${repo}/issues/${context.entityNumber}/comments`, {
-          body: initialBody,
-        });
+        response = await giteaClient.post(
+          `/repos/${owner}/${repo}/issues/${context.entityNumber}/comments`,
+          {
+            body: initialBody,
+          },
+        );
       }
     } else if (isPullRequestReviewCommentEvent(context)) {
       // For Gitea, review comments are created as issue comments on PRs
-      response = await giteaClient.post(`/repos/${owner}/${repo}/issues/${context.entityNumber}/comments`, {
-        body: initialBody,
-      });
+      response = await giteaClient.post(
+        `/repos/${owner}/${repo}/issues/${context.entityNumber}/comments`,
+        {
+          body: initialBody,
+        },
+      );
     } else {
       // For all other cases (issues, issue comments, or missing comment_id)
-      response = await giteaClient.post(`/repos/${owner}/${repo}/issues/${context.entityNumber}/comments`, {
-        body: initialBody,
-      });
+      response = await giteaClient.post(
+        `/repos/${owner}/${repo}/issues/${context.entityNumber}/comments`,
+        {
+          body: initialBody,
+        },
+      );
     }
 
     // Output the comment ID for downstream steps using GITHUB_OUTPUT
@@ -75,9 +89,12 @@ export async function createInitialComment(
 
     // Always fall back to regular issue comment if anything fails
     try {
-      const response = await giteaClient.post(`/repos/${owner}/${repo}/issues/${context.entityNumber}/comments`, {
-        body: initialBody,
-      });
+      const response = await giteaClient.post(
+        `/repos/${owner}/${repo}/issues/${context.entityNumber}/comments`,
+        {
+          body: initialBody,
+        },
+      );
 
       const githubOutput = process.env.GITHUB_OUTPUT!;
       appendFileSync(githubOutput, `claude_comment_id=${response.id}\n`);

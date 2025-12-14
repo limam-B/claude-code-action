@@ -203,7 +203,12 @@ export async function setupBranch(
 
   try {
     // Get the SHA of the source branch to verify it exists
-    const sourceBranchData = await fetchBranch(giteaClient, owner, repo, sourceBranch);
+    const sourceBranchData = await fetchBranch(
+      giteaClient,
+      owner,
+      repo,
+      sourceBranch,
+    );
 
     const currentSHA = sourceBranchData.commit.sha;
     console.log(`Source branch SHA: ${currentSHA}`);

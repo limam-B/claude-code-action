@@ -1,6 +1,7 @@
 # Gitea Compatibility Findings
 
 ## Test Date: 2025-12-14
+
 ## Gitea Instance: http://localhost:3000
 
 ---
@@ -8,6 +9,7 @@
 ## 1. Issue Opened Event Webhook
 
 ### Event Structure
+
 ```
 action: "opened"
 number: 1
@@ -16,6 +18,7 @@ number: 1
 ### Key Fields Analysis
 
 ✅ **COMPATIBLE - Issue Object**:
+
 - `issue.number` - Uses `number` (same as GitHub!)
 - `issue.body` - Contains "@claude please help"
 - `issue.created_at` - ISO timestamp format
@@ -27,12 +30,14 @@ number: 1
 - `issue.url` - API URL
 
 ✅ **COMPATIBLE - Repository Object**:
+
 - `repository.full_name` - "limam/unity-simple-project"
 - `repository.name` - Repository name
 - `repository.owner` - Owner object with `login` field
 - `repository.default_branch` - "main"
 
 ✅ **COMPATIBLE - Sender Object**:
+
 - `sender.login` - Username
 - `sender.id` - User ID
 - `sender.email` - Email address
@@ -46,6 +51,7 @@ number: 1
 ## 2. Issue Comment Event Webhook
 
 ### Event Structure
+
 ```
 action: "created"
 is_pull: false
@@ -54,6 +60,7 @@ is_pull: false
 ### Key Fields Analysis
 
 ✅ **COMPATIBLE - Comment Object**:
+
 - `comment.id` - Numeric ID (9)
 - `comment.body` - "please"
 - `comment.created_at` - ISO timestamp
@@ -63,12 +70,14 @@ is_pull: false
 - `comment.issue_url` - Link to parent issue
 
 ✅ **COMPATIBLE - Issue Object**:
+
 - Full issue object included in payload (same as GitHub)
 - `issue.number` - 1
 - `issue.body` - "@claude please help"
 - All standard fields present
 
 🆕 **GITEA-SPECIFIC FIELD**:
+
 - `is_pull: false` - Distinguishes PR comments from issue comments
   - This is actually BETTER than GitHub (GitHub doesn't have this)
   - Can use this to detect PR vs issue context
@@ -82,6 +91,7 @@ is_pull: false
 ## 3. Pull Request Event Webhook
 
 ### Event Structure
+
 ```
 action: "opened"
 number: 2
@@ -90,6 +100,7 @@ number: 2
 ### Key Fields Analysis
 
 ✅ **COMPATIBLE - Pull Request Object**:
+
 - `pull_request.number` - 2 (uses `number`, not `index`!)
 - `pull_request.title` - String
 - `pull_request.body` - "Test 2b: Pull Request Event"
@@ -102,6 +113,7 @@ number: 2
 - `pull_request.patch_url` - Patch URL
 
 ✅ **COMPATIBLE - Base/Head Refs**:
+
 - `pull_request.base.ref` - "main"
 - `pull_request.base.sha` - Full SHA (a56e513cbe701041d6cc921706cb3ddaffd42cfc)
 - `pull_request.base.repo` - Full repository object
@@ -110,17 +122,20 @@ number: 2
 - `pull_request.head.repo` - Full repository object
 
 ✅ **COMPATIBLE - File Change Stats**:
+
 - `pull_request.additions` - 1
 - `pull_request.deletions` - 0
 - `pull_request.changed_files` - 1
 
 ✅ **COMPATIBLE - Merge Information**:
+
 - `pull_request.mergeable` - true/false
 - `pull_request.merged` - false
 - `pull_request.merge_base` - SHA hash
 - `pull_request.merge_commit_sha` - null (when not merged)
 
 ✅ **COMPATIBLE - Labels & Reviewers**:
+
 - `pull_request.labels` - Array
 - `pull_request.requested_reviewers` - Array
 - `pull_request.assignees` - Array
@@ -128,6 +143,7 @@ number: 2
 ### GitHub Compatibility Score: 99%+
 
 **Critical Finding**: Pull request webhooks are NEARLY IDENTICAL to GitHub!
+
 - Uses `number` field (GitHub compatible)
 - Has `head.sha` and `base.sha` (exactly like GitHub)
 - All essential fields present with same names
@@ -139,6 +155,7 @@ number: 2
 ### Repository API (`GET /repos/{owner}/{repo}`)
 
 ✅ **COMPATIBLE**:
+
 - `id` - Numeric ID
 - `owner.login` - "limam"
 - `name` - "unity-simple-project"
@@ -150,6 +167,7 @@ number: 2
 ### Issue API (`GET /repos/{owner}/{repo}/issues/{number}`)
 
 ✅ **COMPATIBLE**:
+
 - Uses `number` field (not `index`) ⭐
 - `id` - Internal ID (2)
 - `number` - Issue number (1)
@@ -163,6 +181,7 @@ number: 2
 ### Branch API (`GET /repos/{owner}/{repo}/branches/{branch}`)
 
 ✅ **COMPATIBLE**:
+
 - `name` - Branch name
 - `commit.id` - Full SHA hash ⭐ (uses `id`, not `sha`)
 - `commit.message` - Commit message
@@ -171,6 +190,7 @@ number: 2
 - `protected` - Boolean
 
 ⚠️ **FIELD NAME DIFFERENCE**:
+
 - GitHub: `commit.sha`
 - Gitea: `commit.id`
 - **ACTION REQUIRED**: Map `commit.id` → `commit.sha` in our code
@@ -178,6 +198,7 @@ number: 2
 ### Pull Request API (`GET /repos/{owner}/{repo}/pulls/{number}`)
 
 ✅ **HIGHLY COMPATIBLE**:
+
 - `number` - PR number (2) ⭐
 - `title`, `body` - Strings
 - `state` - "open"/"closed"
@@ -195,6 +216,7 @@ number: 2
 ### PR Files API (`GET /repos/{owner}/{repo}/pulls/{number}/files`)
 
 ✅ **FULLY COMPATIBLE**:
+
 - Returns array of file objects
 - `filename` - File path
 - `status` - "changed"/"added"/"removed"
@@ -204,6 +226,7 @@ number: 2
 ### Comments API (`GET /repos/{owner}/{repo}/issues/{number}/comments`)
 
 ✅ **FULLY COMPATIBLE**:
+
 - `id` - Comment ID
 - `body` - Comment text
 - `user.login` - Username
@@ -220,6 +243,7 @@ number: 2
 ### Overall Compatibility: 95-99%
 
 ### ✅ CAN KEEP (No Changes Needed):
+
 1. **`@octokit/webhooks-types`** - Webhook payloads are GitHub-compatible
 2. **Field names in webhooks** - `number`, `body`, `created_at`, `user.login`, etc.
 3. **PR API responses** - `base.sha`, `head.sha` match GitHub exactly
@@ -227,7 +251,9 @@ number: 2
 5. **Environment variables** - `github.event.*` should work in Gitea Actions
 
 ### ⚠️ SINGLE FIELD MAPPING REQUIRED:
+
 **Branch API only**:
+
 - GitHub: `branch.commit.sha`
 - Gitea: `branch.commit.id`
 - **Simple fix**: When calling branch API, map `commit.id` → `commit.sha`
@@ -235,12 +261,14 @@ number: 2
 ### 🎯 MIGRATION STRATEGY IMPACT:
 
 **SIMPLIFIED APPROACH** (compared to original plan):
+
 1. **Keep webhook type definitions** - No custom types needed
 2. **No GraphQL→REST conversion complexity** - Can use REST directly without complex mappings
 3. **Minimal field mapping** - Only 1 field needs mapping (branch.commit.id)
 4. **High code reuse** - Most parsing logic can stay unchanged
 
 ### Key API Endpoints Verified:
+
 - ✅ `GET /repos/{owner}/{repo}` - Repository info
 - ✅ `GET /repos/{owner}/{repo}/issues/{number}` - Issue details
 - ✅ `GET /repos/{owner}/{repo}/issues/{number}/comments` - Comments (works for PRs too)
@@ -249,6 +277,7 @@ number: 2
 - ✅ `GET /repos/{owner}/{repo}/branches/{branch}` - Branch info (with 1 field diff)
 
 ### Gitea-Specific Bonus Features:
+
 - `is_pull` field in comment events (distinguishes PR vs issue comments)
 - Unified comment API (same endpoint for issue and PR comments)
 

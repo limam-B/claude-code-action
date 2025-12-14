@@ -57,7 +57,9 @@ export async function downloadCommentImages(
   repo: string,
   comments: CommentWithImages[],
 ): Promise<Map<string, string>> {
-  console.log("Gitea mode: Image downloading disabled (Gitea doesn't use GitHub's private image hosting)");
+  console.log(
+    "Gitea mode: Image downloading disabled (Gitea doesn't use GitHub's private image hosting)",
+  );
 
   // Return empty map - no images to download in Gitea mode
   return new Map<string, string>();

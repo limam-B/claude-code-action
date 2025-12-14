@@ -40,6 +40,7 @@ Since you have Claude Max, get your OAuth token:
 ## Step 4: Copy the Workflow File
 
 The workflow is already created at:
+
 ```
 .gitea/workflows/test-claude-action.yml
 ```
@@ -62,6 +63,7 @@ git push
 ## Step 6: Test the Action
 
 ### Test 1: Issue Comment
+
 1. Create an issue in your Gitea repository
 2. Add a comment: `@claude please help with this`
 3. Go to **Actions** tab
@@ -69,6 +71,7 @@ git push
 5. Claude should respond in the issue comments
 
 ### Test 2: Pull Request
+
 1. Create a new branch
 2. Make some changes
 3. Create a pull request
@@ -78,6 +81,7 @@ git push
 ## Troubleshooting
 
 ### Check Workflow Logs
+
 1. Go to **Actions** tab in your repository
 2. Click on the failed workflow run
 3. Expand each step to see detailed logs
@@ -86,16 +90,19 @@ git push
 ### Common Issues
 
 **Action not triggering:**
+
 - Check that secrets are set correctly
 - Verify Gitea Actions runner is running
 - Check workflow file syntax
 
 **Authentication errors:**
+
 - Verify `GITEA_TOKEN` is correct
 - Check token has required permissions
 - Ensure `GITEA_API_URL` matches your instance
 
 **API errors:**
+
 - Check Gitea API URL is correct
 - Verify Gitea version is compatible (v1.19+)
 - Check network connectivity from runner to Gitea
@@ -113,6 +120,7 @@ env:
 ## Next Steps
 
 Once the basic test works, you can:
+
 - Customize the trigger phrase
 - Add more event types
 - Configure different modes (tag vs agent)

@@ -38,7 +38,7 @@ export async function checkAndCommitOrDeleteBranch(
     // Check if Claude made any commits to the branch
     try {
       const comparison = await giteaClient.get<any>(
-        `/repos/${owner}/${repo}/compare/${baseBranch}...${claudeBranch}`
+        `/repos/${owner}/${repo}/compare/${baseBranch}...${claudeBranch}`,
       );
 
       // If there are no commits, check for uncommitted changes if not using commit signing
@@ -109,7 +109,9 @@ export async function checkAndCommitOrDeleteBranch(
   // Delete the branch if it has no commits
   if (shouldDeleteBranch && claudeBranch) {
     try {
-      await giteaClient.delete(`/repos/${owner}/${repo}/git/refs/heads/${claudeBranch}`);
+      await giteaClient.delete(
+        `/repos/${owner}/${repo}/git/refs/heads/${claudeBranch}`,
+      );
       console.log(`✅ Deleted empty branch: ${claudeBranch}`);
     } catch (deleteError) {
       console.error(`Failed to delete branch ${claudeBranch}:`, deleteError);

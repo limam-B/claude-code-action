@@ -16,7 +16,7 @@ export async function setupGiteaToken(): Promise<string> {
     if (!token) {
       throw new Error(
         "GITEA_TOKEN environment variable is required. " +
-        "Please provide a Gitea personal access token via the `gitea_token` input in your workflow."
+          "Please provide a Gitea personal access token via the `gitea_token` input in your workflow.",
       );
     }
 
@@ -26,7 +26,7 @@ export async function setupGiteaToken(): Promise<string> {
   } catch (error) {
     core.setFailed(
       `Failed to setup Gitea token: ${error}\n\n` +
-      `Please provide a valid Gitea personal access token via the \`gitea_token\` input in your workflow.`
+        `Please provide a valid Gitea personal access token via the \`gitea_token\` input in your workflow.`,
     );
     process.exit(1);
   }

@@ -29,7 +29,10 @@ export async function updateClaudeComment(
   const { owner, repo, commentId, body } = params;
 
   // Gitea uses the same API for all comment types
-  const response = await giteaClient.patch(`/repos/${owner}/${repo}/issues/comments/${commentId}`, { body });
+  const response = await giteaClient.patch(
+    `/repos/${owner}/${repo}/issues/comments/${commentId}`,
+    { body },
+  );
 
   return {
     id: response.id,
