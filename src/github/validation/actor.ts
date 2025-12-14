@@ -10,11 +10,26 @@
 import type { ParsedGitHubContext } from "../context";
 
 export async function checkHumanActor(githubContext: ParsedGitHubContext) {
-  console.log(
-    `Gitea mode: Skipping human actor check for: ${githubContext.actor}`,
-  );
-  console.log(`Single-user local setup - all actors allowed`);
+  const actor = githubContext.actor;
+  const botName = process.env.BOT_NAME || "claude";
+  const botId = process.env.BOT_ID;
 
-  // In Gitea local setup, skip validation
+  console.log(`Checking actor: ${actor} (ID: ${githubContext.actorId || "unknown"})`);
+
+  // Block the claude bot from triggering itself
+  if (actor === botName) {
+    throw new Error(
+      `Skipping action: triggered by bot user @${botName}. This prevents infinite loops.`,
+    );
+  }
+
+  // Also check by bot ID if available
+  if (botId && githubContext.actorId && String(githubContext.actorId) === String(botId)) {
+    throw new Error(
+      `Skipping action: triggered by bot user ID ${botId}. This prevents infinite loops.`,
+    );
+  }
+
+  console.log(`Actor ${actor} is not a bot - allowing action to proceed`);
   return;
 }
