@@ -52,14 +52,6 @@ inputs:
   api_token:
     description: "Gitea personal access token with repo permissions"
     required: false
-  gitea_api_url:
-    description: "Gitea API URL (e.g., http://host.docker.internal:3000/api/v1)"
-    required: false
-    default: "http://host.docker.internal:3000/api/v1"
-  gitea_server_url:
-    description: "Gitea server URL (e.g., http://host.docker.internal:3000)"
-    required: false
-    default: "http://host.docker.internal:3000"
   use_bedrock:
     description: "Use Amazon Bedrock with OIDC authentication instead of direct Anthropic API"
     required: false

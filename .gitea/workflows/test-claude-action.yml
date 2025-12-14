@@ -21,10 +21,10 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           # Gitea token - you need to add this as a secret in Gitea
-          api_token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          api_token: ${{ secrets.API_TOKEN }}
 
           # Claude Code OAuth token (from your Claude Max subscription)
-          claude_code_oauth_token: ${{ secrets.CLAUDE_OAUTH_TOKEN }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
           # Trigger phrase (default is @claude)
           trigger_phrase: "@claude"
@@ -32,10 +32,7 @@ jobs:
           # Use mounted Claude Code binary (no download needed!)
           path_to_claude_code_executable: "/opt/claude"
 
-          # Optional: Set Gitea API URL if not default
-          # Leave commented if using http://localhost:3000
-          # GITEA_API_URL will be read from environment
         env:
-          # Set Gitea API URL (uncomment and adjust if needed)
-          GITEA_API_URL: "http://host.docker.internal:3000/api/v1"
-          GITEA_SERVER_URL: "http://host.docker.internal:3000"
+          # Gitea URLs from Actions variables
+          GITEA_API_URL: ${{ vars.API_URL }}
+          GITEA_SERVER_URL: ${{ vars.SERVER_URL }}
