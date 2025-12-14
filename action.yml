@@ -188,6 +188,9 @@ runs:
       env:
         PATH_TO_CLAUDE_CODE_EXECUTABLE: ${{ inputs.path_to_claude_code_executable }}
       run: |
+        # Add /opt to PATH for mounted binaries (claude, gitea-mcp)
+        export PATH="/opt:$PATH"
+
         echo "Installing base-action dependencies..."
         cd ${GITHUB_ACTION_PATH}/base-action
         bun install
@@ -226,6 +229,8 @@ runs:
       if: steps.prepare.outputs.contains_trigger == 'true'
       shell: bash
       run: |
+        # Add /opt to PATH for mounted binaries (claude, gitea-mcp)
+        export PATH="/opt:$PATH"
 
         # Run the base-action
         bun run ${GITHUB_ACTION_PATH}/base-action/src/index.ts
