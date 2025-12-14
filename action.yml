@@ -166,6 +166,10 @@ runs:
       id: prepare
       shell: bash
       run: |
+        echo "=== Debug: Environment Variables ==="
+        echo "GITEA_API_URL: ${GITEA_API_URL:-not set}"
+        echo "GITEA_SERVER_URL: ${GITEA_SERVER_URL:-not set}"
+        echo "===================================="
         bun run ${GITHUB_ACTION_PATH}/src/entrypoints/prepare.ts
       env:
         MODE: ${{ inputs.mode }}
