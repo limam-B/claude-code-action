@@ -44,8 +44,17 @@ async function run() {
       showFullOutput: process.env.INPUT_SHOW_FULL_OUTPUT,
     });
   } catch (error) {
-    core.setFailed(`Action failed with error: ${error}`);
+    const errorMessage = error instanceof Error
+      ? `${error.message}\n\nStack trace:\n${error.stack}`
+      : String(error);
+
+    console.error("=== Claude Code Base Action Error ===");
+    console.error(errorMessage);
+    console.error("=====================================");
+
+    core.setFailed(`Action failed with error: ${errorMessage}`);
     core.setOutput("conclusion", "failure");
+    core.setOutput("error_details", errorMessage);
     process.exit(1);
   }
 }

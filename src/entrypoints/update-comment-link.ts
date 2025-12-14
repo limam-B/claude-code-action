@@ -168,10 +168,18 @@ async function run() {
         // Check if the Claude action failed
         const claudeSuccess = process.env.CLAUDE_SUCCESS !== "false";
         actionFailed = !claudeSuccess;
+
+        // Get error details if Claude failed
+        if (actionFailed && process.env.CLAUDE_ERROR) {
+          errorDetails = process.env.CLAUDE_ERROR;
+        }
       } catch (error) {
         console.error("Error reading output file:", error);
         // If we can't read the file, check for any failure markers
         actionFailed = process.env.CLAUDE_SUCCESS === "false";
+        if (actionFailed && process.env.CLAUDE_ERROR) {
+          errorDetails = process.env.CLAUDE_ERROR;
+        }
       }
     }
 
