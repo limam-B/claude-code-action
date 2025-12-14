@@ -13,8 +13,8 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
-const GITEA_API_URL =
-  process.env.GITEA_API_URL || "http://localhost:3000/api/v1";
+// Hardcoded for Docker compatibility
+const GITEA_API_URL = "http://host.docker.internal:3000/api/v1";
 const GITEA_TOKEN = process.env.GITEA_TOKEN;
 const COMMENT_ID = process.env.CLAUDE_COMMENT_ID;
 const REPOSITORY = process.env.REPOSITORY; // format: "owner/repo"

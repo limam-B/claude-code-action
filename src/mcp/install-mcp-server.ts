@@ -110,7 +110,7 @@ export async function prepareMcpConfig(
           GITEA_TOKEN: githubToken,
           REPOSITORY: `${owner}/${repo}`,
           ...(claudeCommentId && { CLAUDE_COMMENT_ID: claudeCommentId }),
-          GITEA_API_URL: GITEA_API_URL,
+          GITEA_API_URL: "http://host.docker.internal:3000/api/v1",
         },
       };
     }
@@ -118,7 +118,7 @@ export async function prepareMcpConfig(
     // Also include official Gitea MCP for file operations
     baseMcpConfig.mcpServers.gitea = {
       command: process.env.GITEA_MCP_PATH || "/opt/gitea-mcp",
-      args: ["-t", "stdio", "--host", GITHUB_SERVER_URL],
+      args: ["-t", "stdio", "--host", "http://host.docker.internal:3000"],
       env: {
         GITEA_ACCESS_TOKEN: githubToken,
       },
