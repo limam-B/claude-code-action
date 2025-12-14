@@ -29,13 +29,13 @@ jobs:
           # Trigger phrase (default is @claude)
           trigger_phrase: "@claude"
 
-          # Use pre-installed Claude Code (skip slow download)
-          path_to_claude_code_executable: "/home/limam/.local/bin/claude"
+          # Use mounted Claude Code binary (no download needed!)
+          path_to_claude_code_executable: "/opt/claude"
 
           # Optional: Set Gitea API URL if not default
           # Leave commented if using http://localhost:3000
           # GITEA_API_URL will be read from environment
         env:
           # Set Gitea API URL (uncomment and adjust if needed)
-          GITEA_API_URL: "http://localhost:3000/api/v1"
-          GITEA_SERVER_URL: "http://localhost:3000"
+          GITEA_API_URL: "http://host.docker.internal:3000/api/v1"
+          GITEA_SERVER_URL: "http://host.docker.internal:3000"
