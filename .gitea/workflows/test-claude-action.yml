@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Claude Code Action
-        uses: ./ # Uses the local action in this repo
+        uses: anthropics/claude-code-action@v1
         with:
           # Gitea token - you need to add this as a secret in Gitea
           gitea_token: ${{ secrets.REPO_ACCESS_TOKEN }}
