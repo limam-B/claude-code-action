@@ -129,10 +129,9 @@ export const tagMode: Mode = {
       "LS",
       "Read",
       "Write",
-      "mcp__github_comment__update_claude_comment",
-      "mcp__github_ci__get_ci_status",
-      "mcp__github_ci__get_workflow_run_details",
-      "mcp__github_ci__download_job_log",
+      // Use official Gitea MCP tools for commenting
+      "mcp__gitea__edit_issue_comment",
+      "mcp__gitea__create_issue_comment",
       ...userAllowedMCPTools,
     ];
 
@@ -148,10 +147,11 @@ export const tagMode: Mode = {
         "Bash(git rm:*)",
       );
     } else {
-      // When using commit signing, use MCP file ops tools
+      // When using commit signing, use Gitea MCP file operations tools
       tagModeTools.push(
-        "mcp__github_file_ops__commit_files",
-        "mcp__github_file_ops__delete_files",
+        "mcp__gitea__create_file",
+        "mcp__gitea__update_file",
+        "mcp__gitea__delete_file",
       );
     }
 

@@ -93,23 +93,26 @@ export async function prepareMcpConfig(
       mcpServers: {},
     };
 
-    // Include comment server:
-    // - Always in tag mode (for updating Claude comments)
+    // Include official Gitea MCP server:
+    // - Always in tag mode (for updating Claude comments and file operations)
     // - Only with explicit tools in agent mode
-    const shouldIncludeCommentServer = !isAgentMode || hasGitHubCommentTools;
+    const shouldIncludeGiteaMcp = !isAgentMode || hasGitHubCommentTools;
 
-    if (shouldIncludeCommentServer) {
-      baseMcpConfig.mcpServers.github_comment = {
-        command: "bun",
+    if (shouldIncludeGiteaMcp) {
+      // Use official gitea-mcp server instead of custom implementation
+      // Use mounted binary from /opt/gitea-mcp (or fall back to PATH)
+      const giteaMcpCommand = process.env.GITEA_MCP_PATH || "/opt/gitea-mcp";
+
+      baseMcpConfig.mcpServers.gitea = {
+        command: giteaMcpCommand,
         args: [
-          "run",
-          `${process.env.GITHUB_ACTION_PATH}/src/mcp/gitea-comment-server.ts`,
+          "-t",
+          "stdio",
+          "--host",
+          GITHUB_SERVER_URL, // Gitea server URL (e.g., http://localhost:3000)
         ],
         env: {
-          GITEA_TOKEN: githubToken,
-          REPOSITORY: `${owner}/${repo}`,
-          ...(claudeCommentId && { CLAUDE_COMMENT_ID: claudeCommentId }),
-          GITEA_API_URL: GITEA_API_URL,
+          GITEA_ACCESS_TOKEN: githubToken,
         },
       };
     }
