@@ -14,70 +14,52 @@ The Claude Code Action has been successfully migrated from GitHub to Gitea with 
 
 | Feature | GitHub Version | Gitea Version | Notes |
 |---------|---------------|---------------|-------|
-| **@claude mentions** | ✅ | ✅ | Fully working |
-| **Issue assignment** | ✅ | ✅ | Fully working |
-| **Label triggers** | ✅ | ✅ | Fully working |
-| **PR comments** | ✅ | ✅ | Fully working |
-| **Code changes & commits** | ✅ | ✅ | Fully working |
-| **Branch creation** | ✅ | ✅ | Fully working |
-| **Git push** | ✅ | ✅ | Fixed via protocol detection |
-| **PR creation** | ✅ | ⚠️ Manual | Claude provides link, user creates PR |
-| **MCP file operations** | ✅ | ✅ | Using official Gitea MCP |
-| **MCP comment updates** | ✅ | ✅ | Custom + official Gitea MCP hybrid |
-| **CI/CD integration** | ✅ | ✅ | Via act_runner |
-| **Authentication** | GitHub App / Token | Personal Access Token | Different auth methods |
-| **Docker networking** | Standard | `host.docker.internal` | Required for Gitea |
-| **Bot user** | GitHub App | Manual setup | Created @claude user |
+| **@claude mentions** | ✅ | ✅ | Works identically |
+| **Issue comments** | ✅ | ✅ | Works identically |
+| **Code changes & commits** | ✅ | ✅ | Works identically |
+| **Branch creation** | ✅ | ✅ | Works identically |
+| **Git push** | ✅ | ✅ | Required protocol fix for http:// |
+| **PR link suggestion** | ✅ | ✅ | Both suggest manual PR creation |
+| **Authentication** | GitHub App / Token | Personal Access Token | Different setup process |
+| **API URLs** | github.com | host.docker.internal:3000 | Different endpoints |
+| **Bot user** | GitHub App auto | Manual @claude user | Manual setup required |
 
 ---
 
-## 🚀 What Works in Gitea Version
+## 🚀 What We Actually Migrated
 
-### ✅ Core Functionality
-- **Issue interaction**: Claude responds to `@claude` mentions in issues
-- **Automated code fixes**: Claude can fix bugs and implement features
-- **Branch operations**: Creates branches like `claude/issue-X-YYYYMMDD-HHMM`
-- **Code commits**: Commits changes with proper attribution
-- **Git push**: Successfully pushes to Gitea repositories
-- **Comment tracking**: Updates progress in issue comments
-- **Label-based triggers**: Responds when issues are labeled with "claude"
+### ✅ Core Functionality (Same as GitHub)
+- Claude responds to `@claude` mentions in issues
+- Creates branches, commits changes, and pushes to remote
+- Updates issue comments with progress
+- All basic Claude Code features work identically
 
-### ✅ MCP Server Integration
-- **Official Gitea MCP**: File operations (read, write, update, delete)
-- **Custom comment server**: Simplified comment updates with environment variables
-- **Hybrid approach**: Best of both official and custom MCP servers
-
-### ✅ Docker & Infrastructure
-- **act_runner**: Gitea Actions runner with Docker support
-- **Mounted binaries**: Claude Code CLI and gitea-mcp available in containers
-- **Network configuration**: `host.docker.internal` for Docker ↔ host communication
-- **Volume mounting**: Persistent storage for runner and tools
-
-### ✅ Authentication & Security
-- **Personal Access Tokens**: Gitea PAT with proper scopes
-- **Bot user setup**: Dedicated @claude bot account
-- **Actions secrets**: API_TOKEN, CLAUDE_CODE_OAUTH_TOKEN
-- **Actions variables**: API_URL, SERVER_URL
+### ✅ What Changed for Gitea
+- **API endpoints**: Changed from github.com to Gitea server
+- **Authentication**: Using Gitea Personal Access Token instead of GitHub App
+- **Git protocol fix**: Added dynamic protocol detection (http:// vs https://)
+- **MCP servers**: Using official Gitea MCP for file operations
+- **Docker networking**: Hardcoded `host.docker.internal` for container access
+- **Bot user**: Manual @claude user setup instead of GitHub App auto-creation
 
 ---
 
-## ⚠️ Known Differences
+## ⚠️ Key Differences from GitHub
 
-### Pull Request Creation
-- **GitHub**: Automatic PR creation via GitHub API
-- **Gitea**: Claude provides branch and suggests manual PR creation
-- **Reason**: Standard Claude SDK behavior, not migration-specific
-- **Workaround**: Click the "Create PR" link Claude provides
+### Authentication Setup
+- **GitHub**: Can use GitHub App (auto-provisioned) or personal token
+- **Gitea**: Requires manual Personal Access Token creation
+- **Impact**: One-time setup - create @claude user and generate PAT
 
-### Authentication
-- **GitHub**: GitHub App with automatic token generation
-- **Gitea**: Manual Personal Access Token setup required
-- **Impact**: Initial setup requires one-time token creation
+### Network Configuration
+- **GitHub**: Uses github.com (public internet)
+- **Gitea**: Uses `host.docker.internal:3000` (local network)
+- **Impact**: URLs are hardcoded for Docker-to-host communication
 
-### Networking
-- **GitHub**: Standard GitHub Actions networking
-- **Gitea**: Requires `host.docker.internal` for Docker containers
-- **Impact**: URLs must use `host.docker.internal:3000` not `localhost:3000`
+### Bot User Setup
+- **GitHub**: GitHub App creates bot identity automatically
+- **Gitea**: Must manually create @claude user account
+- **Impact**: Additional setup step during initial configuration
 
 ---
 
@@ -288,23 +270,6 @@ jobs:
 
 ---
 
-## 🚧 Future Improvements
-
-### Potential Enhancements
-- [ ] Automatic PR creation via Gitea API (if desired)
-- [ ] Multi-repository support
-- [ ] Custom slash commands for Gitea
-- [ ] Enhanced error reporting
-- [ ] Integration tests for Gitea workflows
-
-### Nice-to-Haves
-- [ ] Gitea-specific features (wiki updates, projects, releases)
-- [ ] Better Docker image caching
-- [ ] Gitea organization-level configuration
-- [ ] Custom Gitea actions marketplace integration
-
----
-
 ## 📚 Documentation References
 
 ### Official Documentation
@@ -343,17 +308,21 @@ jobs:
 
 ## 🎉 Conclusion
 
-The migration from GitHub to Gitea is **complete and fully functional**. The Gitea version provides the same core capabilities as the GitHub version with only minor differences in PR creation workflow (manual vs automatic).
+The migration from GitHub to Gitea is **complete and functional**. The Gitea version works identically to the GitHub version - same capabilities, same behavior.
 
-All critical features work:
-- ✅ Code changes and commits
-- ✅ Branch creation and push
-- ✅ Issue interaction
-- ✅ MCP server integration
-- ✅ Docker support
-- ✅ Bot user functionality
+**What changed:**
+- API endpoints (github.com → Gitea server)
+- Authentication method (GitHub App → Gitea PAT)
+- Network URLs (standard → host.docker.internal)
+- Git protocol handling (https:// hardcoded → dynamic detection)
 
-The system is production-ready for Gitea deployments!
+**What stayed the same:**
+- All Claude Code core features
+- Workflow triggers and behavior
+- Issue interaction patterns
+- Code editing capabilities
+
+The migration is complete and ready for use with local Gitea deployments.
 
 ---
 
