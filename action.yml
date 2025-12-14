@@ -244,7 +244,7 @@ runs:
         INPUT_PLUGIN_MARKETPLACES: ${{ inputs.plugin_marketplaces }}
 
         # Model configuration
-        GITHUB_TOKEN: ${{ steps.prepare.outputs.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.prepare.outputs.GITEA_TOKEN }}
         NODE_VERSION: ${{ env.NODE_VERSION }}
         DETAILED_PERMISSION_MESSAGES: "1"
 
@@ -293,7 +293,7 @@ runs:
         PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
         CLAUDE_COMMENT_ID: ${{ steps.prepare.outputs.claude_comment_id }}
         GITHUB_RUN_ID: ${{ github.run_id }}
-        GITHUB_TOKEN: ${{ steps.prepare.outputs.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.prepare.outputs.GITEA_TOKEN }}
         GITHUB_EVENT_NAME: ${{ github.event_name }}
         TRIGGER_COMMENT_ID: ${{ github.event.comment.id }}
         CLAUDE_BRANCH: ${{ steps.prepare.outputs.CLAUDE_BRANCH }}
