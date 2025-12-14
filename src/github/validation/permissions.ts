@@ -1,6 +1,5 @@
 import * as core from "@actions/core";
 import type { ParsedGitHubContext } from "../context";
-import type { Octokit } from "@octokit/rest";
 
 /**
  * Check if the actor has write permissions to the repository
@@ -8,14 +7,12 @@ import type { Octokit } from "@octokit/rest";
  * SIMPLIFIED FOR GITEA: In a local single-user setup with full control,
  * we bypass all permission checks for simplicity.
  *
- * @param octokit - The Octokit REST client (unused in Gitea mode)
  * @param context - The GitHub context
  * @param allowedNonWriteUsers - Comma-separated list of users (unused in Gitea mode)
  * @param githubTokenProvided - Whether token was provided (unused in Gitea mode)
  * @returns Always true for Gitea (single-user local setup)
  */
 export async function checkWritePermissions(
-  octokit: Octokit,
   context: ParsedGitHubContext,
   allowedNonWriteUsers?: string,
   githubTokenProvided?: boolean,

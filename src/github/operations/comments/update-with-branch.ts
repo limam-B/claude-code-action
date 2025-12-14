@@ -10,7 +10,7 @@ import {
   createBranchLink,
   createCommentBody,
 } from "./common";
-import { type Octokits } from "../../api/client";
+import { type GiteaClient } from "../../api/client";
 import {
   isPullRequestReviewCommentEvent,
   type ParsedGitHubContext,
@@ -18,7 +18,7 @@ import {
 import { updateClaudeComment } from "./update-claude-comment";
 
 export async function updateTrackingComment(
-  octokit: Octokits,
+  giteaClient: GiteaClient,
   context: ParsedGitHubContext,
   commentId: number,
   branch?: string,
@@ -39,7 +39,7 @@ export async function updateTrackingComment(
   try {
     const isPRReviewComment = isPullRequestReviewCommentEvent(context);
 
-    await updateClaudeComment(octokit.rest, {
+    await updateClaudeComment(giteaClient, {
       owner,
       repo,
       commentId,

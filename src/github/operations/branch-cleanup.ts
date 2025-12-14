@@ -1,9 +1,9 @@
-import type { Octokits } from "../api/client";
-import { GITHUB_SERVER_URL } from "../api/config";
+import type { GiteaClient } from "../api/client";
+import { GITEA_SERVER_URL } from "../api/config";
 import { $ } from "bun";
 
 export async function checkAndCommitOrDeleteBranch(
-  octokit: Octokits,
+  giteaClient: GiteaClient,
   owner: string,
   repo: string,
   claudeBranch: string | undefined,
@@ -17,14 +17,10 @@ export async function checkAndCommitOrDeleteBranch(
     // First check if the branch exists remotely
     let branchExistsRemotely = false;
     try {
-      await octokit.rest.repos.getBranch({
-        owner,
-        repo,
-        branch: claudeBranch,
-      });
+      await giteaClient.get(`/repos/${owner}/${repo}/branches/${claudeBranch}`);
       branchExistsRemotely = true;
     } catch (error: any) {
-      if (error.status === 404) {
+      if (error.message && error.message.includes("404")) {
         console.log(`Branch ${claudeBranch} does not exist remotely`);
       } else {
         console.error("Error checking if branch exists:", error);
@@ -41,12 +37,9 @@ export async function checkAndCommitOrDeleteBranch(
 
     // Check if Claude made any commits to the branch
     try {
-      const { data: comparison } =
-        await octokit.rest.repos.compareCommitsWithBasehead({
-          owner,
-          repo,
-          basehead: `${baseBranch}...${claudeBranch}`,
-        });
+      const comparison = await giteaClient.get<any>(
+        `/repos/${owner}/${repo}/compare/${baseBranch}...${claudeBranch}`
+      );
 
       // If there are no commits, check for uncommitted changes if not using commit signing
       if (comparison.total_commits === 0) {
@@ -80,7 +73,7 @@ export async function checkAndCommitOrDeleteBranch(
               );
 
               // Set branch link since we now have commits
-              const branchUrl = `${GITHUB_SERVER_URL}/${owner}/${repo}/tree/${claudeBranch}`;
+              const branchUrl = `${GITEA_SERVER_URL}/${owner}/${repo}/src/branch/${claudeBranch}`;
               branchLink = `\n[View branch](${branchUrl})`;
             } else {
               console.log(
@@ -91,7 +84,7 @@ export async function checkAndCommitOrDeleteBranch(
           } catch (gitError) {
             console.error("Error checking/committing changes:", gitError);
             // If we can't check git status, assume the branch might have changes
-            const branchUrl = `${GITHUB_SERVER_URL}/${owner}/${repo}/tree/${claudeBranch}`;
+            const branchUrl = `${GITEA_SERVER_URL}/${owner}/${repo}/src/branch/${claudeBranch}`;
             branchLink = `\n[View branch](${branchUrl})`;
           }
         } else {
@@ -102,13 +95,13 @@ export async function checkAndCommitOrDeleteBranch(
         }
       } else {
         // Only add branch link if there are commits
-        const branchUrl = `${GITHUB_SERVER_URL}/${owner}/${repo}/tree/${claudeBranch}`;
+        const branchUrl = `${GITEA_SERVER_URL}/${owner}/${repo}/src/branch/${claudeBranch}`;
         branchLink = `\n[View branch](${branchUrl})`;
       }
     } catch (error) {
       console.error("Error comparing commits on Claude branch:", error);
       // If we can't compare but the branch exists remotely, include the branch link
-      const branchUrl = `${GITHUB_SERVER_URL}/${owner}/${repo}/tree/${claudeBranch}`;
+      const branchUrl = `${GITEA_SERVER_URL}/${owner}/${repo}/src/branch/${claudeBranch}`;
       branchLink = `\n[View branch](${branchUrl})`;
     }
   }
@@ -116,11 +109,7 @@ export async function checkAndCommitOrDeleteBranch(
   // Delete the branch if it has no commits
   if (shouldDeleteBranch && claudeBranch) {
     try {
-      await octokit.rest.git.deleteRef({
-        owner,
-        repo,
-        ref: `heads/${claudeBranch}`,
-      });
+      await giteaClient.delete(`/repos/${owner}/${repo}/git/refs/heads/${claudeBranch}`);
       console.log(`✅ Deleted empty branch: ${claudeBranch}`);
     } catch (deleteError) {
       console.error(`Failed to delete branch ${claudeBranch}:`, deleteError);

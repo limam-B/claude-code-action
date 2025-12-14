@@ -69,7 +69,7 @@ export const tagMode: Mode = {
     }
 
     // Check if actor is human
-    await checkHumanActor(octokit.rest, context);
+    await checkHumanActor(context);
 
     // Create initial tracking comment
     const commentData = await createInitialComment(giteaClient, context);
@@ -88,7 +88,7 @@ export const tagMode: Mode = {
     });
 
     // Setup branch
-    const branchInfo = await setupBranch(octokit, githubData, context);
+    const branchInfo = await setupBranch(giteaClient, githubData, context);
 
     // Configure git authentication if not using commit signing
     if (!context.inputs.useCommitSigning) {

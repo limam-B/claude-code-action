@@ -7,11 +7,9 @@
  * to validate whether the actor is human or bot.
  */
 
-import type { Octokit } from "@octokit/rest";
 import type { ParsedGitHubContext } from "../context";
 
 export async function checkHumanActor(
-  octokit: Octokit,
   githubContext: ParsedGitHubContext,
 ) {
   console.log(`Gitea mode: Skipping human actor check for: ${githubContext.actor}`);

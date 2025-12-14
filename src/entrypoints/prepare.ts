@@ -34,7 +34,6 @@ async function run() {
       // Check if gitea_token was provided as input
       const giteaTokenProvided = !!process.env.OVERRIDE_GITEA_TOKEN;
       const hasWritePermissions = await checkWritePermissions(
-        octokit.rest,
         context,
         context.inputs.allowedNonWriteUsers,
         giteaTokenProvided,

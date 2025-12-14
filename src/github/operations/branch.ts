@@ -10,7 +10,7 @@ import { execFileSync } from "child_process";
 import * as core from "@actions/core";
 import type { ParsedGitHubContext } from "../context";
 import type { GitHubPullRequest } from "../types";
-import type { Octokits } from "../api/client";
+import type { GiteaClient } from "../api/client";
 import type { FetchDataResult } from "../data/fetcher";
 
 /**
@@ -119,7 +119,7 @@ export type BranchInfo = {
 };
 
 export async function setupBranch(
-  octokits: Octokits,
+  giteaClient: GiteaClient,
   githubData: FetchDataResult,
   context: ParsedGitHubContext,
 ): Promise<BranchInfo> {
@@ -181,11 +181,8 @@ export async function setupBranch(
     sourceBranch = baseBranch;
   } else {
     // No base branch provided, fetch the default branch to use as source
-    const repoResponse = await octokits.rest.repos.get({
-      owner,
-      repo,
-    });
-    sourceBranch = repoResponse.data.default_branch;
+    const repoData = await giteaClient.get<any>(`/repos/${owner}/${repo}`);
+    sourceBranch = repoData.default_branch;
   }
 
   // Generate branch name for either an issue or closed/merged PR
@@ -205,13 +202,9 @@ export async function setupBranch(
 
   try {
     // Get the SHA of the source branch to verify it exists
-    const sourceBranchRef = await octokits.rest.git.getRef({
-      owner,
-      repo,
-      ref: `heads/${sourceBranch}`,
-    });
+    const sourceBranchData = await giteaClient.get<any>(`/repos/${owner}/${repo}/git/refs/heads/${sourceBranch}`);
 
-    const currentSHA = sourceBranchRef.data.object.sha;
+    const currentSHA = sourceBranchData.object.sha;
     console.log(`Source branch SHA: ${currentSHA}`);
 
     // For commit signing, defer branch creation to the file ops server

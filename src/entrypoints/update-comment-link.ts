@@ -72,7 +72,7 @@ async function run() {
     const useCommitSigning = process.env.USE_COMMIT_SIGNING === "true";
     const { shouldDeleteBranch, branchLink } =
       await checkAndCommitOrDeleteBranch(
-        octokit,
+        giteaClient,
         owner,
         repo,
         claudeBranch,
