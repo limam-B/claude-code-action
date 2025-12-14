@@ -52,6 +52,14 @@ inputs:
   gitea_token:
     description: "Gitea personal access token with repo permissions"
     required: false
+  gitea_api_url:
+    description: "Gitea API URL (e.g., http://host.docker.internal:3000/api/v1)"
+    required: false
+    default: "http://host.docker.internal:3000/api/v1"
+  gitea_server_url:
+    description: "Gitea server URL (e.g., http://host.docker.internal:3000)"
+    required: false
+    default: "http://host.docker.internal:3000"
   use_bedrock:
     description: "Use Amazon Bedrock with OIDC authentication instead of direct Anthropic API"
     required: false
@@ -181,8 +189,8 @@ runs:
         ADDITIONAL_PERMISSIONS: ${{ inputs.additional_permissions }}
         CLAUDE_ARGS: ${{ inputs.claude_args }}
         ALL_INPUTS: ${{ toJson(inputs) }}
-        GITEA_API_URL: ${{ env.GITEA_API_URL }}
-        GITEA_SERVER_URL: ${{ env.GITEA_SERVER_URL }}
+        GITEA_API_URL: ${{ inputs.gitea_api_url }}
+        GITEA_SERVER_URL: ${{ inputs.gitea_server_url }}
 
     - name: Install Base Action Dependencies
       if: steps.prepare.outputs.contains_trigger == 'true'
@@ -315,8 +323,8 @@ runs:
         USE_STICKY_COMMENT: ${{ inputs.use_sticky_comment }}
         USE_COMMIT_SIGNING: ${{ inputs.use_commit_signing }}
         TRACK_PROGRESS: ${{ inputs.track_progress }}
-        GITEA_API_URL: ${{ env.GITEA_API_URL }}
-        GITEA_SERVER_URL: ${{ env.GITEA_SERVER_URL }}
+        GITEA_API_URL: ${{ inputs.gitea_api_url }}
+        GITEA_SERVER_URL: ${{ inputs.gitea_server_url }}
 
     - name: Display Claude Code Report
       if: steps.prepare.outputs.contains_trigger == 'true' && steps.claude-code.outputs.execution_file != ''
