@@ -32,7 +32,7 @@ async function run() {
     // Step 3: Check write permissions (only for entity contexts)
     if (isEntityContext(context)) {
       // Check if gitea_token was provided as input
-      const giteaTokenProvided = !!process.env.OVERRIDE_GITEA_TOKEN;
+      const giteaTokenProvided = !!process.env.API_TOKEN;
       const hasWritePermissions = await checkWritePermissions(
         context,
         context.inputs.allowedNonWriteUsers,

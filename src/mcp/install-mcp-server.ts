@@ -107,7 +107,7 @@ export async function prepareMcpConfig(
           `${process.env.GITHUB_ACTION_PATH}/src/mcp/gitea-comment-server.ts`,
         ],
         env: {
-          GITEA_TOKEN: githubToken,
+          API_TOKEN: githubToken,
           REPOSITORY: `${owner}/${repo}`,
           ...(claudeCommentId && { CLAUDE_COMMENT_ID: claudeCommentId }),
           GITEA_API_URL: "http://host.docker.internal:3000/api/v1",

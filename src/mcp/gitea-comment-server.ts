@@ -15,12 +15,12 @@ import { z } from "zod";
 
 // Hardcoded for Docker compatibility
 const GITEA_API_URL = "http://host.docker.internal:3000/api/v1";
-const GITEA_TOKEN = process.env.GITEA_TOKEN;
+const API_TOKEN = process.env.API_TOKEN;
 const COMMENT_ID = process.env.CLAUDE_COMMENT_ID;
 const REPOSITORY = process.env.REPOSITORY; // format: "owner/repo"
 
-if (!GITEA_TOKEN) {
-  throw new Error("GITEA_TOKEN environment variable is required");
+if (!API_TOKEN) {
+  throw new Error("API_TOKEN environment variable is required");
 }
 
 if (!COMMENT_ID) {
@@ -89,7 +89,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const response = await fetch(url, {
       method: "PATCH",
       headers: {
-        Authorization: `token ${GITEA_TOKEN}`,
+        Authorization: `token ${API_TOKEN}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

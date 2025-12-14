@@ -179,8 +179,7 @@ runs:
         LABEL_TRIGGER: ${{ inputs.label_trigger }}
         BASE_BRANCH: ${{ inputs.base_branch }}
         BRANCH_PREFIX: ${{ inputs.branch_prefix }}
-        OVERRIDE_GITEA_TOKEN: ${{ inputs.gitea_token }}
-        GITEA_TOKEN: ${{ inputs.gitea_token }}
+        API_TOKEN: ${{ inputs.gitea_token }}
         ALLOWED_BOTS: ${{ inputs.allowed_bots }}
         ALLOWED_NON_WRITE_USERS: ${{ inputs.allowed_non_write_users }}
         GITHUB_RUN_ID: ${{ github.run_id }}
@@ -193,8 +192,8 @@ runs:
         ADDITIONAL_PERMISSIONS: ${{ inputs.additional_permissions }}
         CLAUDE_ARGS: ${{ inputs.claude_args }}
         ALL_INPUTS: ${{ toJson(inputs) }}
-        GITEA_API_URL: ${{ inputs.gitea_api_url }}
-        GITEA_SERVER_URL: ${{ inputs.gitea_server_url }}
+        GITEA_API_URL: ${{ env.GITEA_API_URL }}
+        GITEA_SERVER_URL: ${{ env.GITEA_SERVER_URL }}
 
     - name: Install Base Action Dependencies
       if: steps.prepare.outputs.contains_trigger == 'true'
@@ -263,7 +262,7 @@ runs:
         INPUT_PLUGIN_MARKETPLACES: ${{ inputs.plugin_marketplaces }}
 
         # Model configuration
-        GITHUB_TOKEN: ${{ steps.prepare.outputs.GITEA_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.prepare.outputs.API_TOKEN }}
         NODE_VERSION: ${{ env.NODE_VERSION }}
         DETAILED_PERMISSION_MESSAGES: "1"
 
@@ -312,7 +311,7 @@ runs:
         PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
         CLAUDE_COMMENT_ID: ${{ steps.prepare.outputs.claude_comment_id }}
         GITHUB_RUN_ID: ${{ github.run_id }}
-        GITHUB_TOKEN: ${{ steps.prepare.outputs.GITEA_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.prepare.outputs.API_TOKEN }}
         GITHUB_EVENT_NAME: ${{ github.event_name }}
         TRIGGER_COMMENT_ID: ${{ github.event.comment.id }}
         CLAUDE_BRANCH: ${{ steps.prepare.outputs.CLAUDE_BRANCH }}
@@ -327,8 +326,8 @@ runs:
         USE_STICKY_COMMENT: ${{ inputs.use_sticky_comment }}
         USE_COMMIT_SIGNING: ${{ inputs.use_commit_signing }}
         TRACK_PROGRESS: ${{ inputs.track_progress }}
-        GITEA_API_URL: ${{ inputs.gitea_api_url }}
-        GITEA_SERVER_URL: ${{ inputs.gitea_server_url }}
+        GITEA_API_URL: ${{ env.GITEA_API_URL }}
+        GITEA_SERVER_URL: ${{ env.GITEA_SERVER_URL }}
 
     - name: Display Claude Code Report
       if: steps.prepare.outputs.contains_trigger == 'true' && steps.claude-code.outputs.execution_file != ''
