@@ -12,6 +12,7 @@ import type { ParsedGitHubContext } from "../context";
 import type { GitHubPullRequest } from "../types";
 import type { GiteaClient } from "../api/client";
 import type { FetchDataResult } from "../data/fetcher";
+import { fetchBranch } from "../api/queries/gitea";
 
 /**
  * Validates a git branch name against a strict whitelist pattern.
@@ -202,9 +203,9 @@ export async function setupBranch(
 
   try {
     // Get the SHA of the source branch to verify it exists
-    const sourceBranchData = await giteaClient.get<any>(`/repos/${owner}/${repo}/git/refs/heads/${sourceBranch}`);
+    const sourceBranchData = await fetchBranch(giteaClient, owner, repo, sourceBranch);
 
-    const currentSHA = sourceBranchData.object.sha;
+    const currentSHA = sourceBranchData.commit.sha;
     console.log(`Source branch SHA: ${currentSHA}`);
 
     // For commit signing, defer branch creation to the file ops server
