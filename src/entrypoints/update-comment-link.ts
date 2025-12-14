@@ -36,7 +36,7 @@ async function run() {
     const giteaClient = createGiteaClient(githubToken);
 
     const serverUrl = GITEA_SERVER_URL;
-    const jobUrl = `${serverUrl}/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+    const jobUrl = `${serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
 
     let comment;
     let isPRReviewComment = false;
