@@ -181,6 +181,8 @@ runs:
         ADDITIONAL_PERMISSIONS: ${{ inputs.additional_permissions }}
         CLAUDE_ARGS: ${{ inputs.claude_args }}
         ALL_INPUTS: ${{ toJson(inputs) }}
+        GITEA_API_URL: ${{ env.GITEA_API_URL }}
+        GITEA_SERVER_URL: ${{ env.GITEA_SERVER_URL }}
 
     - name: Install Base Action Dependencies
       if: steps.prepare.outputs.contains_trigger == 'true'
@@ -313,6 +315,8 @@ runs:
         USE_STICKY_COMMENT: ${{ inputs.use_sticky_comment }}
         USE_COMMIT_SIGNING: ${{ inputs.use_commit_signing }}
         TRACK_PROGRESS: ${{ inputs.track_progress }}
+        GITEA_API_URL: ${{ env.GITEA_API_URL }}
+        GITEA_SERVER_URL: ${{ env.GITEA_SERVER_URL }}
 
     - name: Display Claude Code Report
       if: steps.prepare.outputs.contains_trigger == 'true' && steps.claude-code.outputs.execution_file != ''
