@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { createOctokit } from "../github/api/client";
+import { createOctokit, createGiteaClient } from "../github/api/client";
 import * as fs from "fs/promises";
 import {
   updateCommentBody,
@@ -11,7 +11,7 @@ import {
   isPullRequestReviewCommentEvent,
   isEntityContext,
 } from "../github/context";
-import { GITHUB_SERVER_URL } from "../github/api/config";
+import { GITEA_SERVER_URL } from "../github/api/config";
 import { checkAndCommitOrDeleteBranch } from "../github/operations/branch-cleanup";
 import { updateClaudeComment } from "../github/operations/comments/update-claude-comment";
 
@@ -33,41 +33,20 @@ async function run() {
     const { owner, repo } = context.repository;
 
     const octokit = createOctokit(githubToken);
+    const giteaClient = createGiteaClient(githubToken);
 
-    const serverUrl = GITHUB_SERVER_URL;
+    const serverUrl = GITEA_SERVER_URL;
     const jobUrl = `${serverUrl}/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
     let comment;
     let isPRReviewComment = false;
 
     try {
-      // GitHub has separate ID namespaces for review comments and issue comments
-      // We need to use the correct API based on the event type
-      if (isPullRequestReviewCommentEvent(context)) {
-        // For PR review comments, use the pulls API
-        console.log(`Fetching PR review comment ${commentId}`);
-        const { data: prComment } = await octokit.rest.pulls.getReviewComment({
-          owner,
-          repo,
-          comment_id: commentId,
-        });
-        comment = prComment;
-        isPRReviewComment = true;
-        console.log("Successfully fetched as PR review comment");
-      }
-
-      // For all other event types, use the issues API
-      if (!comment) {
-        console.log(`Fetching issue comment ${commentId}`);
-        const { data: issueComment } = await octokit.rest.issues.getComment({
-          owner,
-          repo,
-          comment_id: commentId,
-        });
-        comment = issueComment;
-        isPRReviewComment = false;
-        console.log("Successfully fetched as issue comment");
-      }
+      // Gitea uses the same API for all comment types (issue comments)
+      console.log(`Fetching issue comment ${commentId}`);
+      comment = await giteaClient.get(`/repos/${owner}/${repo}/issues/comments/${commentId}`);
+      isPRReviewComment = false;
+      console.log("Successfully fetched comment");
     } catch (finalError) {
       // If all attempts fail, try to determine more information about the comment
       console.error("Failed to fetch comment. Debug info:");
@@ -78,14 +57,8 @@ async function run() {
 
       // Try to get the PR info to understand the comment structure
       try {
-        const { data: pr } = await octokit.rest.pulls.get({
-          owner,
-          repo,
-          pull_number: context.entityNumber,
-        });
+        const pr = await giteaClient.get(`/repos/${owner}/${repo}/pulls/${context.entityNumber}`);
         console.log(`PR state: ${pr.state}`);
-        console.log(`PR comments count: ${pr.comments}`);
-        console.log(`PR review comments count: ${pr.review_comments}`);
       } catch {
         console.error("Could not fetch PR info for debugging");
       }
@@ -121,16 +94,11 @@ async function run() {
       if (!containsPRUrl) {
         // Check if there are changes to the branch compared to the default branch
         try {
-          const { data: comparison } =
-            await octokit.rest.repos.compareCommitsWithBasehead({
-              owner,
-              repo,
-              basehead: `${baseBranch}...${claudeBranch}`,
-            });
+          const comparison = await giteaClient.get(`/repos/${owner}/${repo}/compare/${baseBranch}...${claudeBranch}`);
 
           // If there are changes (commits or file changes), add the PR URL
           if (
-            comparison.total_commits > 0 ||
+            (comparison.commits && comparison.commits.length > 0) ||
             (comparison.files && comparison.files.length > 0)
           ) {
             const entityType = context.isPR ? "PR" : "Issue";
@@ -217,7 +185,7 @@ async function run() {
     const updatedBody = updateCommentBody(commentInput);
 
     try {
-      await updateClaudeComment(octokit.rest, {
+      await updateClaudeComment(giteaClient, {
         owner,
         repo,
         commentId,

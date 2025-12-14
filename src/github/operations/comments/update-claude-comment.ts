@@ -1,4 +1,4 @@
-import { Octokit } from "@octokit/rest";
+import type { GiteaClient } from "../../api/client";
 
 export type UpdateClaudeCommentParams = {
   owner: string;
@@ -15,56 +15,25 @@ export type UpdateClaudeCommentResult = {
 };
 
 /**
- * Updates a Claude comment on GitHub (either an issue/PR comment or a PR review comment)
+ * Updates a Claude comment on Gitea (issue/PR comments)
  *
- * @param octokit - Authenticated Octokit instance
+ * @param giteaClient - Authenticated Gitea client
  * @param params - Parameters for updating the comment
  * @returns The updated comment details
  * @throws Error if the update fails
  */
 export async function updateClaudeComment(
-  octokit: Octokit,
+  giteaClient: GiteaClient,
   params: UpdateClaudeCommentParams,
 ): Promise<UpdateClaudeCommentResult> {
-  const { owner, repo, commentId, body, isPullRequestReviewComment } = params;
+  const { owner, repo, commentId, body } = params;
 
-  let response;
-
-  try {
-    if (isPullRequestReviewComment) {
-      // Try PR review comment API first
-      response = await octokit.rest.pulls.updateReviewComment({
-        owner,
-        repo,
-        comment_id: commentId,
-        body,
-      });
-    } else {
-      // Use issue comment API (works for both issues and PR general comments)
-      response = await octokit.rest.issues.updateComment({
-        owner,
-        repo,
-        comment_id: commentId,
-        body,
-      });
-    }
-  } catch (error: any) {
-    // If PR review comment update fails with 404, fall back to issue comment API
-    if (isPullRequestReviewComment && error.status === 404) {
-      response = await octokit.rest.issues.updateComment({
-        owner,
-        repo,
-        comment_id: commentId,
-        body,
-      });
-    } else {
-      throw error;
-    }
-  }
+  // Gitea uses the same API for all comment types
+  const response = await giteaClient.patch(`/repos/${owner}/${repo}/issues/comments/${commentId}`, { body });
 
   return {
-    id: response.data.id,
-    html_url: response.data.html_url,
-    updated_at: response.data.updated_at,
+    id: response.id,
+    html_url: response.html_url,
+    updated_at: response.updated_at,
   };
 }
