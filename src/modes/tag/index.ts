@@ -60,6 +60,7 @@ export const tagMode: Mode = {
   async prepare({
     context,
     octokit,
+    giteaClient,
     githubToken,
   }: ModeOptions): Promise<ModeResult> {
     // Tag mode only handles entity-based events
@@ -71,7 +72,7 @@ export const tagMode: Mode = {
     await checkHumanActor(octokit.rest, context);
 
     // Create initial tracking comment
-    const commentData = await createInitialComment(octokit.rest, context);
+    const commentData = await createInitialComment(giteaClient, context);
     const commentId = commentData.id;
 
     const triggerTime = extractTriggerTimestamp(context);
