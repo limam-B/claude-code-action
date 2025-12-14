@@ -1,6 +1,5 @@
 import { execFileSync } from "child_process";
-import type { Octokits, GiteaClient } from "../api/client";
-import { ISSUE_QUERY, PR_QUERY, USER_QUERY } from "../api/queries/github";
+import type { GiteaClient } from "../api/client";
 import { fetchPullRequest, fetchIssue, fetchIssueComments, fetchPullRequestFiles } from "../api/queries/gitea";
 import {
   isIssueCommentEvent,
@@ -141,7 +140,6 @@ export function isBodySafeToUse(
 }
 
 type FetchDataParams = {
-  octokits: Octokits;
   giteaClient: GiteaClient;
   repository: string;
   prNumber: string;
@@ -165,7 +163,6 @@ export type FetchDataResult = {
 };
 
 export async function fetchGitHubData({
-  octokits,
   giteaClient,
   repository,
   prNumber,
@@ -379,7 +376,7 @@ export async function fetchGitHubData({
   ];
 
   const imageUrlMap = await downloadCommentImages(
-    octokits,
+    giteaClient,
     owner,
     repo,
     allComments,
@@ -388,7 +385,7 @@ export async function fetchGitHubData({
   // Fetch trigger user display name if username is provided
   let triggerDisplayName: string | null | undefined;
   if (triggerUsername) {
-    triggerDisplayName = await fetchUserDisplayName(octokits, triggerUsername);
+    triggerDisplayName = await fetchUserDisplayName(giteaClient, triggerUsername);
   }
 
   return {
@@ -402,21 +399,20 @@ export async function fetchGitHubData({
   };
 }
 
-export type UserQueryResponse = {
-  user: {
-    name: string | null;
-  };
-};
-
+/**
+ * Fetch user display name from Gitea
+ *
+ * @param giteaClient - Authenticated Gitea client
+ * @param login - Username to fetch
+ * @returns User's full name or null if not found
+ */
 export async function fetchUserDisplayName(
-  octokits: Octokits,
+  giteaClient: GiteaClient,
   login: string,
 ): Promise<string | null> {
   try {
-    const result = await octokits.graphql<UserQueryResponse>(USER_QUERY, {
-      login,
-    });
-    return result.user.name;
+    const user = await giteaClient.get<any>(`/users/${login}`);
+    return user.full_name || null;
   } catch (error) {
     console.warn(`Failed to fetch user display name for ${login}:`, error);
     return null;

@@ -78,7 +78,6 @@ export const tagMode: Mode = {
     const triggerTime = extractTriggerTimestamp(context);
 
     const githubData = await fetchGitHubData({
-      octokits: octokit,
       giteaClient,
       repository: `${context.repository.owner}/${context.repository.repo}`,
       prNumber: context.entityNumber.toString(),
