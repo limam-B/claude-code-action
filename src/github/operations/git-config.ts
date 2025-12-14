@@ -48,7 +48,7 @@ export async function configureGitAuth(
 
   // Update the remote URL to include the token for authentication
   console.log("Updating remote URL with authentication...");
-  const remoteUrl = `https://x-access-token:${githubToken}@${serverUrl.host}/${context.repository.owner}/${context.repository.repo}.git`;
+  const remoteUrl = `${serverUrl.protocol}//x-access-token:${githubToken}@${serverUrl.host}/${context.repository.owner}/${context.repository.repo}.git`;
   await $`git remote set-url origin ${remoteUrl}`;
   console.log("✓ Updated remote URL with authentication token");
 
