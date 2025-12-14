@@ -79,6 +79,7 @@ export const tagMode: Mode = {
 
     const githubData = await fetchGitHubData({
       octokits: octokit,
+      giteaClient,
       repository: `${context.repository.owner}/${context.repository.repo}`,
       prNumber: context.entityNumber.toString(),
       isPR: context.isPR,

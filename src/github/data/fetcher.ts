@@ -1,6 +1,7 @@
 import { execFileSync } from "child_process";
-import type { Octokits } from "../api/client";
+import type { Octokits, GiteaClient } from "../api/client";
 import { ISSUE_QUERY, PR_QUERY, USER_QUERY } from "../api/queries/github";
+import { fetchPullRequest, fetchIssue, fetchIssueComments, fetchPullRequestFiles } from "../api/queries/gitea";
 import {
   isIssueCommentEvent,
   isPullRequestReviewEvent,
@@ -141,6 +142,7 @@ export function isBodySafeToUse(
 
 type FetchDataParams = {
   octokits: Octokits;
+  giteaClient: GiteaClient;
   repository: string;
   prNumber: string;
   isPR: boolean;
@@ -164,6 +166,7 @@ export type FetchDataResult = {
 
 export async function fetchGitHubData({
   octokits,
+  giteaClient,
   repository,
   prNumber,
   isPR,
@@ -182,52 +185,86 @@ export async function fetchGitHubData({
 
   try {
     if (isPR) {
-      // Fetch PR data with all comments and file information
-      const prResult = await octokits.graphql<PullRequestQueryResponse>(
-        PR_QUERY,
-        {
-          owner,
-          repo,
-          number: parseInt(prNumber),
+      // Fetch PR data using Gitea REST API
+      const pr = await fetchPullRequest(giteaClient, owner, repo, parseInt(prNumber));
+      const prComments = await fetchIssueComments(giteaClient, owner, repo, parseInt(prNumber));
+      const prFiles = await fetchPullRequestFiles(giteaClient, owner, repo, parseInt(prNumber));
+
+      // Transform Gitea PR response to match GitHub GraphQL structure
+      contextData = {
+        number: pr.number,
+        title: pr.title,
+        body: pr.body || "",
+        state: pr.state,
+        createdAt: pr.created_at,
+        updatedAt: pr.updated_at,
+        author: {
+          login: pr.user.login,
         },
+        comments: {
+          nodes: prComments.map((c: any) => ({
+            id: c.id.toString(),
+            body: c.body,
+            createdAt: c.created_at,
+            updatedAt: c.updated_at,
+            author: {
+              login: c.user.login,
+            },
+          })),
+        },
+        files: {
+          nodes: prFiles.map((f: any) => ({
+            path: f.filename,
+            additions: f.additions,
+            deletions: f.deletions,
+            changeType: f.status === "added" ? "ADDED" : f.status === "removed" ? "DELETED" : f.status === "modified" ? "MODIFIED" : "MODIFIED",
+          })),
+        },
+      } as GitHubPullRequest;
+
+      changedFiles = contextData.files.nodes || [];
+      comments = filterCommentsToTriggerTime(
+        contextData.comments?.nodes || [],
+        triggerTime,
       );
+      reviewData = { nodes: [] }; // Gitea doesn't have separate review API like GitHub
 
-      if (prResult.repository.pullRequest) {
-        const pullRequest = prResult.repository.pullRequest;
-        contextData = pullRequest;
-        changedFiles = pullRequest.files.nodes || [];
-        comments = filterCommentsToTriggerTime(
-          pullRequest.comments?.nodes || [],
-          triggerTime,
-        );
-        reviewData = pullRequest.reviews || [];
-
-        console.log(`Successfully fetched PR #${prNumber} data`);
-      } else {
-        throw new Error(`PR #${prNumber} not found`);
-      }
+      console.log(`Successfully fetched PR #${prNumber} data`);
     } else {
-      // Fetch issue data
-      const issueResult = await octokits.graphql<IssueQueryResponse>(
-        ISSUE_QUERY,
-        {
-          owner,
-          repo,
-          number: parseInt(prNumber),
+      // Fetch issue data using Gitea REST API
+      const issue = await fetchIssue(giteaClient, owner, repo, parseInt(prNumber));
+      const issueComments = await fetchIssueComments(giteaClient, owner, repo, parseInt(prNumber));
+
+      // Transform Gitea issue response to match GitHub GraphQL structure
+      contextData = {
+        number: issue.number,
+        title: issue.title,
+        body: issue.body || "",
+        state: issue.state,
+        createdAt: issue.created_at,
+        updatedAt: issue.updated_at,
+        author: {
+          login: issue.user.login,
         },
+        comments: {
+          nodes: issueComments.map((c: any) => ({
+            id: c.id.toString(),
+            body: c.body,
+            createdAt: c.created_at,
+            updatedAt: c.updated_at,
+            author: {
+              login: c.user.login,
+            },
+          })),
+        },
+      } as GitHubIssue;
+
+      comments = filterCommentsToTriggerTime(
+        contextData.comments?.nodes || [],
+        triggerTime,
       );
 
-      if (issueResult.repository.issue) {
-        contextData = issueResult.repository.issue;
-        comments = filterCommentsToTriggerTime(
-          contextData?.comments?.nodes || [],
-          triggerTime,
-        );
-
-        console.log(`Successfully fetched issue #${prNumber} data`);
-      } else {
-        throw new Error(`Issue #${prNumber} not found`);
-      }
+      console.log(`Successfully fetched issue #${prNumber} data`);
     }
   } catch (error) {
     console.error(`Failed to fetch ${isPR ? "PR" : "issue"} data:`, error);
