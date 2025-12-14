@@ -129,9 +129,10 @@ export const tagMode: Mode = {
       "LS",
       "Read",
       "Write",
-      // Use official Gitea MCP tools for commenting
-      "mcp__gitea__edit_issue_comment",
-      "mcp__gitea__create_issue_comment",
+      // Use custom comment server (wraps comment ID in env vars)
+      "mcp__github_comment__update_claude_comment",
+      // Official Gitea MCP for file operations
+      "mcp__gitea__get_file_content",
       ...userAllowedMCPTools,
     ];
 
