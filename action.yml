@@ -49,7 +49,7 @@ inputs:
   claude_code_oauth_token:
     description: "Claude Code OAuth token (alternative to anthropic_api_key)"
     required: false
-  gitea_token:
+  api_token:
     description: "Gitea personal access token with repo permissions"
     required: false
   gitea_api_url:
@@ -179,7 +179,7 @@ runs:
         LABEL_TRIGGER: ${{ inputs.label_trigger }}
         BASE_BRANCH: ${{ inputs.base_branch }}
         BRANCH_PREFIX: ${{ inputs.branch_prefix }}
-        API_TOKEN: ${{ inputs.gitea_token }}
+        API_TOKEN: ${{ inputs.api_token }}
         ALLOWED_BOTS: ${{ inputs.allowed_bots }}
         ALLOWED_NON_WRITE_USERS: ${{ inputs.allowed_non_write_users }}
         GITHUB_RUN_ID: ${{ github.run_id }}
