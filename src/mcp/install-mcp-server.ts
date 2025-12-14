@@ -1,5 +1,9 @@
 import * as core from "@actions/core";
-import { GITHUB_API_URL, GITHUB_SERVER_URL } from "../github/api/config";
+import {
+  GITHUB_API_URL,
+  GITHUB_SERVER_URL,
+  GITEA_API_URL,
+} from "../github/api/config";
 import type { GitHubContext } from "../github/context";
 import { isEntityContext } from "../github/context";
 import { Octokit } from "@octokit/rest";
