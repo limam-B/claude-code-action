@@ -99,15 +99,13 @@ export async function prepareMcpConfig(
         command: "bun",
         args: [
           "run",
-          `${process.env.GITHUB_ACTION_PATH}/src/mcp/github-comment-server.ts`,
+          `${process.env.GITHUB_ACTION_PATH}/src/mcp/gitea-comment-server.ts`,
         ],
         env: {
-          GITHUB_TOKEN: githubToken,
-          REPO_OWNER: owner,
-          REPO_NAME: repo,
+          GITEA_TOKEN: githubToken,
+          REPOSITORY: `${owner}/${repo}`,
           ...(claudeCommentId && { CLAUDE_COMMENT_ID: claudeCommentId }),
-          GITHUB_EVENT_NAME: process.env.GITHUB_EVENT_NAME || "",
-          GITHUB_API_URL: GITHUB_API_URL,
+          GITEA_API_URL: GITEA_API_URL,
         },
       };
     }
