@@ -1,8 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(rm -rf /home/limam/.cache/act/cf611367fb0cc1487ad4df9f4ff9b6bf4bd4eb28788a357fe515498a4f943aa5/)",
-      "Bash(ls -la * )"
+      "Bash(rm -rf /home/limam/.cache/act/cf611367fb0cc1487ad4df9f4ff9b6bf4bd4eb28788a357fe515498a4f943aa5/)"
     ]
   },
   "hooks": {

@@ -14,21 +14,22 @@ The Claude Code Action has been successfully migrated from GitHub to Gitea with 
 
 Based on official documentation from `/docs/capabilities-and-limitations.md`:
 
-| Capability | GitHub Version | Gitea Version | Implementation |
-|------------|----------------|---------------|----------------|
-| **Respond in single comment** | ✅ | ✅ | Identical |
-| **Answer questions** | ✅ | ✅ | Identical |
-| **Implement code changes** | ✅ | ✅ | Identical |
-| **Prepare Pull Requests*** | ✅ | ✅ | Both create branch + provide link |
-| **Perform code reviews** | ✅ | ✅ | Identical |
-| **Smart branch handling** | ✅ | ✅ | Identical |
-| **View CI results** | ✅ | ⚠️ Not tested | GitHub Actions vs Gitea Actions |
+| Capability                    | GitHub Version | Gitea Version | Implementation                    |
+| ----------------------------- | -------------- | ------------- | --------------------------------- |
+| **Respond in single comment** | ✅             | ✅            | Identical                         |
+| **Answer questions**          | ✅             | ✅            | Identical                         |
+| **Implement code changes**    | ✅             | ✅            | Identical                         |
+| **Prepare Pull Requests\***   | ✅             | ✅            | Both create branch + provide link |
+| **Perform code reviews**      | ✅             | ✅            | Identical                         |
+| **Smart branch handling**     | ✅             | ✅            | Identical                         |
+| **View CI results**           | ✅             | ⚠️ Not tested | GitHub Actions vs Gitea Actions   |
 
 \* **Important**: Neither version automatically creates PRs. Both create the branch and provide a link to create the PR manually.
 
 ### What Cannot Be Done (Both Versions)
 
 From official docs, both versions **cannot**:
+
 - Submit formal PR reviews
 - Approve pull requests
 - Post multiple comments (single comment updates only)
@@ -37,24 +38,26 @@ From official docs, both versions **cannot**:
 
 ### Infrastructure Differences
 
-| Aspect | GitHub Version | Gitea Version |
-|--------|----------------|---------------|
-| **Authentication** | GitHub App (auto) or PAT | Gitea PAT (manual) |
-| **API Endpoint** | https://api.github.com | http://host.docker.internal:3000/api/v1 |
-| **Bot Identity** | GitHub App creates automatically | Manual @claude user setup |
-| **Git Protocol** | HTTPS (default) | Dynamic (http:// or https://) |
+| Aspect             | GitHub Version                   | Gitea Version                           |
+| ------------------ | -------------------------------- | --------------------------------------- |
+| **Authentication** | GitHub App (auto) or PAT         | Gitea PAT (manual)                      |
+| **API Endpoint**   | https://api.github.com           | http://host.docker.internal:3000/api/v1 |
+| **Bot Identity**   | GitHub App creates automatically | Manual @claude user setup               |
+| **Git Protocol**   | HTTPS (default)                  | Dynamic (http:// or https://)           |
 
 ---
 
 ## 🚀 What We Actually Migrated
 
 ### ✅ Core Functionality (Same as GitHub)
+
 - Claude responds to `@claude` mentions in issues
 - Creates branches, commits changes, and pushes to remote
 - Updates issue comments with progress
 - All basic Claude Code features work identically
 
 ### ✅ What Changed for Gitea
+
 - **API endpoints**: Changed from github.com to Gitea server
 - **Authentication**: Using Gitea Personal Access Token instead of GitHub App
 - **Git protocol fix**: Added dynamic protocol detection (http:// vs https://)
@@ -67,16 +70,19 @@ From official docs, both versions **cannot**:
 ## ⚠️ Key Differences from GitHub
 
 ### Authentication Setup
+
 - **GitHub**: Can use GitHub App (auto-provisioned) or personal token
 - **Gitea**: Requires manual Personal Access Token creation
 - **Impact**: One-time setup - create @claude user and generate PAT
 
 ### Network Configuration
+
 - **GitHub**: Uses github.com (public internet)
 - **Gitea**: Uses `host.docker.internal:3000` (local network)
 - **Impact**: URLs are hardcoded for Docker-to-host communication
 
 ### Bot User Setup
+
 - **GitHub**: GitHub App creates bot identity automatically
 - **Gitea**: Must manually create @claude user account
 - **Impact**: Additional setup step during initial configuration
@@ -86,12 +92,15 @@ From official docs, both versions **cannot**:
 ## 🔧 Key Migration Changes
 
 ### 1. Environment Variables
+
 **Before (GitHub):**
+
 ```yaml
 github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 **After (Gitea):**
+
 ```yaml
 api_token: ${{ secrets.API_TOKEN }}
 env:
@@ -100,26 +109,32 @@ env:
 ```
 
 ### 2. API Configuration
+
 **Changed files:**
+
 - `src/github/api/config.ts`: Hardcoded `host.docker.internal:3000`
 - `src/github/token.ts`: Changed from `GITHUB_TOKEN` to `API_TOKEN`
 - `src/mcp/install-mcp-server.ts`: Added official Gitea MCP integration
 - `src/mcp/gitea-comment-server.ts`: Custom MCP for comment operations
 
 ### 3. Git Operations
+
 **Fixed:** TLS handshake error in `src/github/operations/git-config.ts`
 
 **Before:**
+
 ```typescript
 const remoteUrl = `https://x-access-token:${githubToken}@${serverUrl.host}/...`;
 ```
 
 **After:**
+
 ```typescript
 const remoteUrl = `${serverUrl.protocol}//x-access-token:${githubToken}@${serverUrl.host}/...`;
 ```
 
 ### 4. Bot Detection
+
 **Added:** Prevent infinite loops from bot triggering itself
 
 ```typescript
@@ -138,12 +153,14 @@ export async function checkHumanActor(githubContext: ParsedGitHubContext) {
 ## 📦 Setup Requirements
 
 ### Gitea Server Setup
+
 1. **Gitea instance running** on `http://localhost:3000`
 2. **act_runner configured** with Docker support
 3. **Bot user created** (@claude)
 4. **Repository with Actions enabled**
 
 ### act_runner Configuration
+
 ```yaml
 container:
   options: >-
@@ -152,15 +169,17 @@ container:
     -v /usr/local/bin/gitea-mcp:/opt/gitea-mcp:ro
 
   valid_volumes:
-    - '/opt/claude'
-    - '/opt/gitea-mcp'
+    - "/opt/claude"
+    - "/opt/gitea-mcp"
 ```
 
 ### Required Secrets
+
 - `API_TOKEN`: Gitea Personal Access Token from @claude user
 - `CLAUDE_CODE_OAUTH_TOKEN`: Claude Max subscription OAuth token
 
 ### Required Variables
+
 - `API_URL`: `http://host.docker.internal:3000/api/v1`
 - `SERVER_URL`: `http://host.docker.internal:3000`
 
@@ -173,22 +192,27 @@ container:
 Created comprehensive test scenarios:
 
 1. **Bug Fix** ✅
+
    - Issue: Power function using `*` instead of `**`
    - Result: Claude fixed and pushed to branch
 
 2. **Feature Implementation** ✅
+
    - Issue: Add modulo and square root operations
    - Result: Claude implemented with error handling
 
 3. **Test Coverage** ✅
+
    - Issue: Create pytest unit tests
    - Result: Claude generated comprehensive tests
 
 4. **Documentation** ✅
+
    - Issue: Create API documentation
    - Result: Claude created docs/API.md and docs/USAGE.md
 
 5. **Error Handling** ✅
+
    - Issue: Fix division by zero crash
    - Result: Claude added proper error handling
 
@@ -293,12 +317,14 @@ jobs:
 ## 📚 Documentation References
 
 ### Official Documentation
+
 - **Claude Code**: https://github.com/anthropics/claude-code
 - **Gitea**: https://docs.gitea.com/
 - **Gitea MCP**: https://github.com/khulnasoft/gitea-mcp
 - **act_runner**: https://docs.gitea.com/usage/actions/act-runner
 
 ### Migration-Specific Files
+
 - `GITEA_SETUP.md`: Initial Gitea setup guide
 - `action.yml`: Updated action definition
 - `src/github/api/config.ts`: Hardcoded Gitea URLs
@@ -333,6 +359,7 @@ The migration from GitHub to Gitea is **complete and functional**.
 ### Core Capabilities: 100% Identical
 
 According to official documentation (`/docs/capabilities-and-limitations.md`), both versions have **identical capabilities**:
+
 - ✅ Respond in single comment
 - ✅ Answer questions
 - ✅ Implement code changes
@@ -343,6 +370,7 @@ According to official documentation (`/docs/capabilities-and-limitations.md`), b
 ### What Actually Changed
 
 **Only infrastructure/setup differences:**
+
 1. API endpoints: `github.com` → `host.docker.internal:3000`
 2. Authentication: GitHub App (auto) → Gitea PAT (manual setup)
 3. Bot identity: Auto-provisioned → Manual @claude user

@@ -44,9 +44,10 @@ async function run() {
       showFullOutput: process.env.INPUT_SHOW_FULL_OUTPUT,
     });
   } catch (error) {
-    const errorMessage = error instanceof Error
-      ? `${error.message}\n\nStack trace:\n${error.stack}`
-      : String(error);
+    const errorMessage =
+      error instanceof Error
+        ? `${error.message}\n\nStack trace:\n${error.stack}`
+        : String(error);
 
     console.error("=== Claude Code Base Action Error ===");
     console.error(errorMessage);

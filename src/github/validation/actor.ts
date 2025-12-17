@@ -14,7 +14,9 @@ export async function checkHumanActor(githubContext: ParsedGitHubContext) {
   const botName = process.env.BOT_NAME || "claude";
   const botId = process.env.BOT_ID;
 
-  console.log(`Checking actor: ${actor} (ID: ${githubContext.actorId || "unknown"})`);
+  console.log(
+    `Checking actor: ${actor} (ID: ${githubContext.actorId || "unknown"})`,
+  );
 
   // Block the claude bot from triggering itself
   if (actor === botName) {
@@ -24,7 +26,11 @@ export async function checkHumanActor(githubContext: ParsedGitHubContext) {
   }
 
   // Also check by bot ID if available
-  if (botId && githubContext.actorId && String(githubContext.actorId) === String(botId)) {
+  if (
+    botId &&
+    githubContext.actorId &&
+    String(githubContext.actorId) === String(botId)
+  ) {
     throw new Error(
       `Skipping action: triggered by bot user ID ${botId}. This prevents infinite loops.`,
     );
