@@ -758,7 +758,7 @@ ${eventData.eventName === "issue_comment" || eventData.eventName === "pull_reque
         - The body should include:
           - A clear description of the changes
           - Reference to the original ${eventData.isPR ? "PR" : "issue"}
-          - The signature: "Generated with [Claude Code](https://claude.ai/code)"
+          - The signature: "Generated with Claude Code"
         - Just include the markdown link with text "Create a PR" - do not add explanatory text before it like "You can create a PR using this link"`
           : ""
       }

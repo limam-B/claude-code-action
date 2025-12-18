@@ -220,7 +220,7 @@ describe("updateCommentBody", () => {
 
     it("handles PR links with unencoded spaces and special characters", () => {
       const unEncodedUrl =
-        "https://github.com/owner/repo/compare/main...feature-branch?quick_pull=1&title=fix: update welcome message&body=Generated with [Claude Code](https://claude.ai/code)";
+        "https://github.com/owner/repo/compare/main...feature-branch?quick_pull=1&title=fix: update welcome message&body=Generated with Claude Code";
       const expectedEncodedUrl =
         "https://github.com/owner/repo/compare/main...feature-branch?quick_pull=1&title=fix%3A+update+welcome+message&body=Generated+with+%5BClaude+Code%5D%28https%3A%2F%2Fclaude.ai%2Fcode%29";
       const input = {

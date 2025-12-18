@@ -113,7 +113,7 @@ async function run() {
               `${entityType} #${context.entityNumber}: Changes from Claude`,
             );
             const prBody = encodeURIComponent(
-              `This PR addresses ${entityType.toLowerCase()} #${context.entityNumber}\n\nGenerated with [Claude Code](https://claude.ai/code)`,
+              `This PR addresses ${entityType.toLowerCase()} #${context.entityNumber}\n\nGenerated with Claude Code`,
             );
             const prUrl = `${serverUrl}/${owner}/${repo}/compare/${baseBranch}...${claudeBranch}?quick_pull=1&title=${prTitle}&body=${prBody}`;
             prLink = `\n[Create a PR](${prUrl})`;
