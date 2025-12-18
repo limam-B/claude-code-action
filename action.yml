@@ -240,6 +240,10 @@ runs:
         # Add /opt to PATH for mounted binaries (claude, gitea-mcp)
         export PATH="/opt:$PATH"
 
+        # Unset INPUT_PROMPT since agent mode writes prompt to file
+        # (GitHub Actions auto-sets INPUT_PROMPT from 'with: prompt' input)
+        unset INPUT_PROMPT
+
         # Run the base-action
         bun run ${GITHUB_ACTION_PATH}/base-action/src/index.ts
       env:
