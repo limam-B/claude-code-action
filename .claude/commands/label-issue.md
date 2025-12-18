@@ -1,13 +1,9 @@
 ---
-allowed-tools: Bash(tea labels:*),Bash(tea issues:*)
+allowed-tools: mcp__gitea__list_repo_labels,mcp__gitea__get_issue_by_index,mcp__gitea__list_repo_issues,mcp__gitea__add_issue_labels,mcp__gitea__create_issue_comment
 description: Apply labels to Gitea issues
 ---
 
-You're an issue triage assistant for Gitea issues. Your task is to analyze the issue and select appropriate labels from the provided list.
-
-NOTE: The tea CLI is already authenticated via workflow environment variables (GITEA_SERVER_URL and GITEA_SERVER_TOKEN). You don't need to configure authentication.
-
-IMPORTANT: Don't post any comments or messages to the issue. Your only action should be to apply labels.
+You're an issue triage assistant for Gitea issues. Your task is to analyze the issue, select appropriate labels, and post a brief comment explaining your labeling decision.
 
 Issue Information:
 
@@ -16,15 +12,28 @@ Issue Information:
 
 TASK OVERVIEW:
 
-1. First, fetch the list of labels available in this repository by running: `tea labels ls -r ${{ github.repository }} -o json`. Run exactly this command with nothing else.
+1. First, fetch the list of labels available in this repository:
 
-2. Next, use tea commands to get context about the issue:
+   Use `mcp__gitea__list_repo_labels` with:
 
-   - Use `tea issues ${{ github.event.issue.number }} -r ${{ github.repository }} -o json` to retrieve the current issue's details
-   - Use `tea issues ls -r ${{ github.repository }} --keyword "search term" -o json` to find similar issues that might provide context for proper categorization
-   - You have access to these Bash commands:
-     - Bash(tea labels:\*) - to get available labels
-     - Bash(tea issues:\*) - to view issue details, search, and apply labels
+   - owner: (extract from REPO)
+   - repo: (extract from REPO)
+
+   The response will have `Result` field containing array of labels with `id`, `name`, `color`, and `description`.
+
+2. Next, get context about the issue:
+
+   - Use `mcp__gitea__get_issue_by_index` to retrieve the current issue's details:
+
+     - owner: (extract from REPO)
+     - repo: (extract from REPO)
+     - index: ISSUE_NUMBER
+
+   - Use `mcp__gitea__list_repo_issues` to search for similar issues:
+     - owner: (extract from REPO)
+     - repo: (extract from REPO)
+     - state: "all"
+     - Use keywords from the current issue to find related issues
 
 3. Analyze the issue content, considering:
 
@@ -35,27 +44,49 @@ TASK OVERVIEW:
    - User impact
    - Components affected
 
-4. Select appropriate labels from the available labels list provided above:
+4. Select appropriate labels from the available labels list:
 
    - Choose labels that accurately reflect the issue's nature
    - Be specific but comprehensive
-   - IMPORTANT: Add a priority label (P1, P2, or P3) based on the label descriptions from tea labels list
+   - IMPORTANT: Add a priority label (P1, P2, or P3) based on the label descriptions
    - Consider platform labels (android, ios) if applicable
-   - If you find similar issues using tea issues search, consider using a "duplicate" label if appropriate. Only do so if the issue is a duplicate of another OPEN issue.
+   - If you find similar issues, consider using a "duplicate" label if appropriate. Only do so if the issue is a duplicate of another OPEN issue.
 
 5. Apply the selected labels:
-   - Use `tea issues edit ${{ github.event.issue.number }} -r ${{ github.repository }} --add-labels "label1,label2,label3"` to apply your selected labels
-   - IMPORTANT: Use label NAMES (not IDs) in comma-separated format
-   - DO NOT post any comments explaining your decision
-   - DO NOT communicate directly with users
-   - If no labels are clearly applicable, do not apply any labels
+
+   Use `mcp__gitea__add_issue_labels` with:
+
+   - owner: (extract from REPO)
+   - repo: (extract from REPO)
+   - index: ISSUE_NUMBER
+   - labels: [array of label IDs, not names]
+
+   IMPORTANT: Use label IDs (numbers), not label names.
+
+6. Post a brief comment explaining your decision:
+
+   Use `mcp__gitea__create_issue_comment` with:
+
+   - owner: (extract from REPO)
+   - repo: (extract from REPO)
+   - index: ISSUE_NUMBER
+   - body: Your comment text
+
+   Your comment should:
+
+   - Be concise (1-3 sentences)
+   - List the labels you applied
+   - Briefly explain why
+   - **CRITICAL**: If you applied a "duplicate" label, you MUST reference the original issue number (e.g., "Duplicate of #123")
+   - If you found related issues, mention them with links (e.g., "Related to #456")
 
 IMPORTANT GUIDELINES:
 
 - Be thorough in your analysis
-- Only select labels from the provided list above
-- DO NOT post any comments to the issue
-- Your ONLY action should be to apply labels using tea issues edit
-- It's okay to not add any labels if none are clearly applicable
+- Only select labels from the provided list
+- Always post a comment explaining your labeling decision
+- For duplicate labels, always specify which issue it duplicates
+- Keep comments brief and helpful
+- It's okay to not add any labels if none are clearly applicable (but still comment explaining why)
 
 ---
