@@ -155,7 +155,17 @@ runs:
       shell: bash
       run: |
         cd ${GITHUB_ACTION_PATH}
-        bun install
+        # Copy pre-installed node_modules from Docker image if available
+        if [ -d "/opt/claude-code-action-deps/node_modules" ] && [ ! -d "node_modules" ]; then
+          echo "Copying pre-installed dependencies from Docker image..."
+          cp -r /opt/claude-code-action-deps/node_modules .
+          echo "✓ Dependencies copied (~2s vs 38s install)"
+        elif [ -d "node_modules" ]; then
+          echo "Dependencies already exist, skipping..."
+        else
+          echo "Installing dependencies (no pre-installed cache found)..."
+          bun install
+        fi
 
     - name: Prepare action
       id: prepare
@@ -199,11 +209,20 @@ runs:
         # Add /opt to PATH for mounted binaries (claude, gitea-mcp)
         export PATH="/opt:$PATH"
 
-        echo "Installing base-action dependencies..."
-        cd ${GITHUB_ACTION_PATH}/base-action
-        bun install
-        echo "Base-action dependencies installed"
-        cd -
+        # Copy pre-installed base-action dependencies if available
+        if [ -d "/opt/claude-code-action-deps/base-action/node_modules" ] && [ ! -d "${GITHUB_ACTION_PATH}/base-action/node_modules" ]; then
+          echo "Copying pre-installed base-action dependencies..."
+          cp -r /opt/claude-code-action-deps/base-action/node_modules ${GITHUB_ACTION_PATH}/base-action/
+          echo "✓ Base-action dependencies copied (~1s vs 15s install)"
+        elif [ -d "${GITHUB_ACTION_PATH}/base-action/node_modules" ]; then
+          echo "Base-action dependencies already exist, skipping..."
+        else
+          echo "Installing base-action dependencies (no pre-installed cache found)..."
+          cd ${GITHUB_ACTION_PATH}/base-action
+          bun install
+          echo "Base-action dependencies installed"
+          cd -
+        fi
 
         # Install Claude Code if no custom executable is provided
         if [ -z "$PATH_TO_CLAUDE_CODE_EXECUTABLE" ]; then
