@@ -150,7 +150,7 @@ export async function prepareMcpConfig(
     if (
       isEntityContext(context) &&
       context.isPR &&
-      (hasGitHubMcpTools || hasInlineCommentTools)
+      (hasGiteaMcpTools || hasInlineCommentTools)
     ) {
       baseMcpConfig.mcpServers.github_inline_comment = {
         command: "bun",
@@ -210,7 +210,7 @@ export async function prepareMcpConfig(
       };
     }
 
-    if (hasGitHubMcpTools) {
+    if (hasGiteaMcpTools) {
       baseMcpConfig.mcpServers.github = {
         command: "docker",
         args: [
