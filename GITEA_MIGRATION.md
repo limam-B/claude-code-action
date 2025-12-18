@@ -314,6 +314,104 @@ jobs:
 
 ---
 
+## 🔄 MCP-First Architecture
+
+### Philosophy
+
+As of December 2024, this Gitea fork follows a **MCP-first approach** for all user-facing Claude commands and tools:
+
+- **User Commands**: Use Gitea MCP tools exclusively (no CLI wrappers)
+- **Infrastructure Code**: TypeScript uses REST API (runs before MCP is available)
+- **Git Operations**: Keep as Bash commands (local filesystem operations)
+
+### Rationale
+
+**Why MCP over CLI?**
+
+| Aspect             | CLI (gh/tea)      | MCP Tools            | Winner |
+| ------------------ | ----------------- | -------------------- | ------ |
+| Type Safety        | ❌ String parsing | ✅ Schema validated  | MCP    |
+| Error Messages     | ❌ Parse output   | ✅ Structured errors | MCP    |
+| Discoverability    | ❌ Man pages      | ✅ list_tools()      | MCP    |
+| Claude Integration | ❌ Parse stdout   | ✅ Native format     | MCP    |
+| Debugging          | ❌ Log scraping   | ✅ Stack traces      | MCP    |
+
+**Why Keep REST in Infrastructure?**
+
+- Infrastructure code runs **before Claude starts** (no MCP servers yet)
+- Keeps codebase mergeable with upstream (GitHub version)
+- Minimal abstraction - direct API calls
+
+### Migrated Commands
+
+**✅ Completed MCP Migrations:**
+
+1. **`/label-issue`** - Issue triage and auto-labeling
+
+   - Before: `tea labels ls`, `tea issues edit --add-labels`
+   - After: `mcp__gitea__list_repo_labels`, `mcp__gitea__add_issue_labels`
+   - Benefits: Uses label IDs (not names), no string parsing
+
+2. **`/review-pr`** - Pull request code review
+   - Before: `gh pr view`, `gh pr diff`, `gh pr comment`
+   - After: `mcp__gitea__get_pull_request_by_index`, `mcp__gitea__create_issue_comment`, `Bash(curl)` for diffs
+   - Benefits: Structured PR data, reliable comment posting
+
+### Available MCP Tools
+
+**Gitea MCP (Official) provides:**
+
+- **Issues**: list, get, create, edit, comments
+- **PRs**: list, get, create, reviewers
+- **Labels**: list, get, create, edit, delete, add/remove from issues
+- **Branches**: list, create, delete
+- **Files**: create, get, update, delete, list directory
+- **Wiki**: list, get, create, update, delete pages, history
+- **Releases**: list, get, create, delete
+- **Tags**: list, get, create, delete
+- **Repository**: create, fork, search
+- **Organizations**: teams, labels
+
+**Custom MCP Servers:**
+
+- `gitea-comment-server` - Update tracking comments (wraps comment ID in env)
+- `github-file-ops-server` - Commit signing (when enabled)
+
+### MCP Tool Usage Pattern
+
+When creating new Claude commands, follow this pattern:
+
+```markdown
+---
+allowed-tools: mcp__gitea__tool_name,mcp__gitea__another_tool
+description: Command description
+---
+
+# Instructions for Claude
+
+1. Use `mcp__gitea__list_repo_xyz` to fetch data
+2. Process the Result field from response
+3. Use `mcp__gitea__create_xyz` to perform actions
+4. All responses return { Result: ... } structure
+```
+
+### Docker Image Requirements
+
+To use MCP tools in workflows, your Docker image must include:
+
+```dockerfile
+# Install Gitea MCP v0.5.0
+RUN curl -fsSL https://gitea.com/gitea/gitea-mcp/releases/download/v0.5.0/gitea-mcp_Linux_x86_64.tar.gz -o /tmp/gitea-mcp.tar.gz && \
+    tar -xzf /tmp/gitea-mcp.tar.gz -C /tmp && \
+    mv /tmp/gitea-mcp /opt/gitea-mcp && \
+    chmod +x /opt/gitea-mcp && \
+    ln -s /opt/gitea-mcp /usr/local/bin/gitea-mcp
+```
+
+The action automatically configures MCP servers in `src/mcp/install-mcp-server.ts`.
+
+---
+
 ## 📚 Documentation References
 
 ### Official Documentation
