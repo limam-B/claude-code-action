@@ -311,6 +311,7 @@ runs:
         PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
         CLAUDE_COMMENT_ID: ${{ steps.prepare.outputs.claude_comment_id }}
         GITHUB_RUN_ID: ${{ github.run_id }}
+        API_TOKEN: ${{ inputs.api_token }}
         GITHUB_TOKEN: ${{ steps.prepare.outputs.github_token }}
         GH_TOKEN: ${{ steps.prepare.outputs.github_token }}
         GITHUB_EVENT_NAME: ${{ github.event_name }}

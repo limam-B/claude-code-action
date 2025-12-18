@@ -18,7 +18,8 @@ import { updateClaudeComment } from "../github/operations/comments/update-claude
 async function run() {
   try {
     const commentId = parseInt(process.env.CLAUDE_COMMENT_ID!);
-    const githubToken = process.env.GITHUB_TOKEN!;
+    // For Gitea, use API_TOKEN; fallback to GITHUB_TOKEN for GitHub
+    const githubToken = process.env.API_TOKEN || process.env.GITHUB_TOKEN!;
     const claudeBranch = process.env.CLAUDE_BRANCH;
     const baseBranch = process.env.BASE_BRANCH || "main";
     const triggerUsername = process.env.TRIGGER_USERNAME;
