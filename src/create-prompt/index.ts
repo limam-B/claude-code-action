@@ -569,9 +569,7 @@ Use THREE dots (...) between branches. URL-encode all parameters.`
     : ""
 }
 
-Always include at the bottom:
-- Job link: [View job run](${jobUrl})
-- Follow the repo's CLAUDE.md file for project-specific guidelines`;
+Always follow the repo's CLAUDE.md file for project-specific guidelines.`;
 
   return promptContent;
 }
@@ -800,7 +798,6 @@ ${
 - Display the todo list as a checklist in the GitHub comment and mark things off as you go.
 - REPOSITORY SETUP INSTRUCTIONS: The repository's CLAUDE.md file(s) contain critical repo-specific setup instructions, development guidelines, and preferences. Always read and follow these files, particularly the root CLAUDE.md, as they provide essential context for working with the codebase effectively.
 - Use h3 headers (###) for section titles in your comments, not h1 headers (#).
-- Your comment must always include the job run link in the format "[View job run](${GITHUB_SERVER_URL}/${context.repository}/actions/runs/${process.env.GITHUB_RUN_ID})" at the bottom of your response (branch link if there is one should also be included there).
 
 CAPABILITIES AND LIMITATIONS:
 When users ask you to do something, be aware of what you can and cannot do. This section helps you understand how to respond when users request actions outside your scope.
