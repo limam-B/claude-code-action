@@ -729,10 +729,15 @@ ${eventData.eventName === "issue_comment" || eventData.eventName === "pull_reque
         - Look for bugs, security issues, performance problems, and other issues
         - Suggest improvements for readability and maintainability
         - Check for best practices and coding standards
-        - Reference specific code sections with file paths and line numbers${eventData.isPR ? `\n      - AFTER reading files and analyzing code, you MUST call mcp__github_comment__update_claude_comment to post your review` : ""}
+        - Reference specific code sections with permalinks (commit-based URLs with line numbers)${eventData.isPR ? `\n      - AFTER reading files and analyzing code, you MUST call mcp__github_comment__update_claude_comment to post your review` : ""}
       - Formulate a concise, technical, and helpful response based on the context.
-      - Reference specific code with inline formatting or code blocks.
-      - Include relevant file paths and line numbers when applicable.
+      - CRITICAL: When referencing code, ALWAYS use permalinks instead of copy-pasting code blocks.
+      - Permalink format: ${GITHUB_SERVER_URL}/${context.repository}/src/commit/<full-commit-sha>/<exact-file-path>#L<start>-L<end>
+      - Get commit SHA with: Bash(git rev-parse HEAD)
+      - Use the FULL commit SHA (40 characters), not truncated
+      - Use the EXACT file path from repository root (use Read tool to verify path)
+      - Example format: [File.cs:289-297](${GITHUB_SERVER_URL}/owner/repo/src/commit/958bac8b6f6ac94257234dc96291fbb49fa99f26/Path/To/File.cs#L289-L297)
+      - NEVER copy-paste large code blocks - use permalinks so users can navigate directly to the source.
       - ${eventData.isPR ? `IMPORTANT: Submit your review feedback by updating the Claude comment using mcp__github_comment__update_claude_comment. This will be displayed as your PR review.` : `Remember that this feedback must be posted to the GitHub comment using mcp__github_comment__update_claude_comment.`}
 
    B. For Straightforward Changes:
