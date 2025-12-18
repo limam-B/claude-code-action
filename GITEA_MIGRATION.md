@@ -348,9 +348,10 @@ As of December 2024, this Gitea fork follows a **MCP-first approach** for all us
 
 1. **`/label-issue`** - Issue triage and auto-labeling
 
-   - Before: `tea labels ls`, `tea issues edit --add-labels`
-   - After: `mcp__gitea__list_repo_labels`, `mcp__gitea__add_issue_labels`
-   - Benefits: Uses label IDs (not names), no string parsing
+   - Before: `tea labels ls`, `tea issues edit --add-labels`, no comments
+   - After: `mcp__gitea__list_repo_labels`, `mcp__gitea__add_issue_labels`, `mcp__gitea__create_issue_comment`
+   - Benefits: Uses label IDs (not names), no string parsing, posts explanatory comments
+   - UX Enhancement: When applying "duplicate" label, now references the original issue number
 
 2. **`/review-pr`** - Pull request code review
    - Before: `gh pr view`, `gh pr diff`, `gh pr comment`
