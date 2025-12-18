@@ -66,9 +66,9 @@ Execution steps:
 
 #### MCP Server Integration (`src/mcp/`)
 
-- **GitHub Actions Server** (`github-actions-server.ts`): Workflow and CI access
-- **GitHub Comment Server** (`github-comment-server.ts`): Comment operations
-- **GitHub File Operations** (`github-file-ops-server.ts`): File system access
+- **Gitea Comment Server** (`gitea-comment-server.ts`): Comment operations (custom MCP: `mcp__gitea_comment__update_claude_comment`)
+- **Gitea MCP Server** (official): File operations, issues, PRs, labels, etc. (tools prefixed with `mcp__gitea__*`)
+- **GitHub File Operations** (`github-file-ops-server.ts`): Commit signing (when enabled)
 - Auto-installation and configuration in `install-mcp-server.ts`
 
 #### Authentication & Security (`src/github/`)
