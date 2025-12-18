@@ -2,7 +2,7 @@
 
 /**
  * Gitea Comment MCP Server
- * Provides github_comment__update_claude_comment tool for Gitea
+ * Provides gitea_comment__update_claude_comment tool for Gitea
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -35,7 +35,7 @@ const [owner, repo] = REPOSITORY.split("/");
 
 const server = new Server(
   {
-    name: "github_comment",
+    name: "gitea_comment",
     version: "1.0.0",
   },
   {

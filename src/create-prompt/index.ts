@@ -43,7 +43,7 @@ export function buildAllowedToolsString(
   let baseTools = [...BASE_ALLOWED_TOOLS];
 
   // Always include the comment update tool for tag mode
-  baseTools.push("mcp__github_comment__update_claude_comment");
+  baseTools.push("mcp__gitea_comment__update_claude_comment");
 
   // Add commit signing tools if enabled
   if (useCommitSigning) {
@@ -555,8 +555,8 @@ Decide what's being asked:
 2. **Code change** - Implement the change, commit, and push
 
 Communication:
-- Your ONLY visible output is your GitHub comment - update it with progress and results
-- Use mcp__github_comment__update_claude_comment to update (only "body" param needed)
+- Your ONLY visible output is your Gitea comment - update it with progress and results
+- Use mcp__gitea_comment__update_claude_comment to update (only "body" param needed)
 - Use checklist format for tasks: - [ ] incomplete, - [x] complete
 - Use ### headers (not #)
 ${getCommitInstructions(eventData, githubData, context, useCommitSigning)}
@@ -613,7 +613,7 @@ export function generateDefaultPrompt(
     ? `
 
 <images_info>
-Images have been downloaded from GitHub comments and saved to disk. Their file paths are included in the formatted comments and body above. You can use the Read tool to view these images.
+Images have been downloaded from Gitea comments and saved to disk. Their file paths are included in the formatted comments and body above. You can use the Read tool to view these images.
 </images_info>`
     : "";
 
@@ -672,9 +672,9 @@ ${sanitizeContent(eventData.commentBody)}
     : ""
 }
 ${`<comment_tool_info>
-IMPORTANT: You have been provided with the mcp__github_comment__update_claude_comment tool to update your comment. This tool automatically handles both issue and PR comments.
+IMPORTANT: You have been provided with the mcp__gitea_comment__update_claude_comment tool to update your comment. This tool automatically handles both issue and PR comments.
 
-Tool usage example for mcp__github_comment__update_claude_comment:
+Tool usage example for mcp__gitea_comment__update_claude_comment:
 {
   "body": "Your comment text here"
 }
@@ -686,14 +686,14 @@ Your task is to analyze the context, understand the request, and provide helpful
 IMPORTANT CLARIFICATIONS:
 - When asked to "review" code, read the code and provide review feedback (do not implement changes unless explicitly asked)${eventData.isPR ? "\n- For PR reviews: Your review will be posted when you update the comment. Focus on providing comprehensive review feedback." : ""}${eventData.isPR && eventData.baseBranch ? `\n- When comparing PR changes, use 'origin/${eventData.baseBranch}' as the base reference (NOT 'main' or 'master')` : ""}
 - Your console outputs and tool results are NOT visible to the user
-- ALL communication happens through your GitHub comment - that's how users see your feedback, answers, and progress. your normal responses are not seen.
+- ALL communication happens through your Gitea comment - that's how users see your feedback, answers, and progress. your normal responses are not seen.
 
 Follow these steps:
 
 1. Create a Todo List:
-   - Use your GitHub comment to maintain a detailed task list based on the request.
+   - Use your Gitea comment to maintain a detailed task list based on the request.
    - Format todos as a checklist (- [ ] for incomplete, - [x] for complete).
-   - Update the comment using mcp__github_comment__update_claude_comment with each task completion.
+   - Update the comment using mcp__gitea_comment__update_claude_comment with each task completion.
 
 2. Gather Context:
    - Analyze the pre-fetched data provided above.
@@ -729,7 +729,7 @@ ${eventData.eventName === "issue_comment" || eventData.eventName === "pull_reque
         - Look for bugs, security issues, performance problems, and other issues
         - Suggest improvements for readability and maintainability
         - Check for best practices and coding standards
-        - Reference specific code sections with permalinks (commit-based URLs with line numbers)${eventData.isPR ? `\n      - AFTER reading files and analyzing code, you MUST call mcp__github_comment__update_claude_comment to post your review` : ""}
+        - Reference specific code sections with permalinks (commit-based URLs with line numbers)${eventData.isPR ? `\n      - AFTER reading files and analyzing code, you MUST call mcp__gitea_comment__update_claude_comment to post your review` : ""}
       - Formulate a concise, technical, and helpful response based on the context.
       - CRITICAL: When referencing code, ALWAYS use permalinks instead of copy-pasting code blocks.
       - Permalink format: ${GITHUB_SERVER_URL}/${context.repository}/src/commit/<full-commit-sha>/<exact-file-path>#L<start>-L<end>
@@ -738,7 +738,7 @@ ${eventData.eventName === "issue_comment" || eventData.eventName === "pull_reque
       - Use the EXACT file path from repository root (use Read tool to verify path)
       - Example format: [File.cs:289-297](${GITHUB_SERVER_URL}/owner/repo/src/commit/958bac8b6f6ac94257234dc96291fbb49fa99f26/Path/To/File.cs#L289-L297)
       - NEVER copy-paste large code blocks - use permalinks so users can navigate directly to the source.
-      - ${eventData.isPR ? `IMPORTANT: Submit your review feedback by updating the Claude comment using mcp__github_comment__update_claude_comment. This will be displayed as your PR review.` : `Remember that this feedback must be posted to the GitHub comment using mcp__github_comment__update_claude_comment.`}
+      - ${eventData.isPR ? `IMPORTANT: Submit your review feedback by updating the Claude comment using mcp__gitea_comment__update_claude_comment. This will be displayed as your PR review.` : `Remember that this feedback must be posted to the Gitea comment using mcp__gitea_comment__update_claude_comment.`}
 
    B. For Straightforward Changes:
       - Use file system tools to make the change locally.
@@ -773,16 +773,16 @@ ${eventData.eventName === "issue_comment" || eventData.eventName === "pull_reque
       - Or explain why it's too complex: mark todo as completed in checklist with explanation.
 
 5. Final Update:
-   - Always update the GitHub comment to reflect the current todo state.
+   - Always update the Gitea comment to reflect the current todo state.
    - When all todos are completed, remove the spinner and add a brief summary of what was accomplished, and what was not done.
    - Note: If you see previous Claude comments with headers like "**Claude finished @user's task**" followed by "---", do not include this in your comment. The system adds this automatically.
    - If you changed any files locally, you must update them in the remote branch via ${useCommitSigning ? "mcp__github_file_ops__commit_files" : "git commands (add, commit, push)"} before saying that you're done.
    ${eventData.claudeBranch ? `- If you created anything in your branch, your comment must include the PR URL with prefilled title and body mentioned above.` : ""}
 
 Important Notes:
-- All communication must happen through GitHub PR comments.
-- Never create new comments. Only update the existing comment using mcp__github_comment__update_claude_comment.
-- This includes ALL responses: code reviews, answers to questions, progress updates, and final results.${eventData.isPR ? `\n- PR CRITICAL: After reading files and forming your response, you MUST post it by calling mcp__github_comment__update_claude_comment. Do NOT just respond with a normal response, the user will not see it.` : ""}
+- All communication must happen through Gitea comments.
+- Never create new comments. Only update the existing comment using mcp__gitea_comment__update_claude_comment.
+- This includes ALL responses: code reviews, answers to questions, progress updates, and final results.${eventData.isPR ? `\n- PR CRITICAL: After reading files and forming your response, you MUST post it by calling mcp__gitea_comment__update_claude_comment. Do NOT just respond with a normal response, the user will not see it.` : ""}
 - You communicate exclusively by editing your single comment - not through any other means.
 - Use this spinner HTML when work is in progress: <img src="https://github.com/user-attachments/assets/5ac382c7-e004-429b-8e35-7feb3e8f9c6f" width="14px" height="14px" style="vertical-align: middle; margin-left: 4px;" />
 ${eventData.isPR && !eventData.claudeBranch ? `- Always push to the existing branch when triggered on a PR.` : `- IMPORTANT: You are already on the correct branch (${eventData.claudeBranch || "the created branch"}). Never create new branches when triggered on issues or closed/merged PRs.`}
@@ -800,7 +800,7 @@ ${
   - Check status: Bash(git status)
   - View diff: Bash(git diff)${eventData.isPR && eventData.baseBranch ? `\n  - IMPORTANT: For PR diffs, use: Bash(git diff origin/${eventData.baseBranch}...HEAD)` : ""}`
 }
-- Display the todo list as a checklist in the GitHub comment and mark things off as you go.
+- Display the todo list as a checklist in the Gitea comment and mark things off as you go.
 - REPOSITORY SETUP INSTRUCTIONS: The repository's CLAUDE.md file(s) contain critical repo-specific setup instructions, development guidelines, and preferences. Always read and follow these files, particularly the root CLAUDE.md, as they provide essential context for working with the codebase effectively.
 - Use h3 headers (###) for section titles in your comments, not h1 headers (#).
 

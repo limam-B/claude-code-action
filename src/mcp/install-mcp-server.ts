@@ -73,20 +73,20 @@ export async function prepareMcpConfig(
     // Detect if we're in agent mode (explicit prompt provided)
     const isAgentMode = mode === "agent";
 
-    const hasGitHubCommentTools = allowedToolsList.some((tool) =>
-      tool.startsWith("mcp__github_comment__"),
+    const hasGiteaCommentTools = allowedToolsList.some((tool) =>
+      tool.startsWith("mcp__gitea_comment__"),
     );
 
-    const hasGitHubMcpTools = allowedToolsList.some((tool) =>
-      tool.startsWith("mcp__github__"),
+    const hasGiteaMcpTools = allowedToolsList.some((tool) =>
+      tool.startsWith("mcp__gitea__"),
     );
 
     const hasInlineCommentTools = allowedToolsList.some((tool) =>
-      tool.startsWith("mcp__github_inline_comment__"),
+      tool.startsWith("mcp__gitea_inline_comment__"),
     );
 
-    const hasGitHubCITools = allowedToolsList.some((tool) =>
-      tool.startsWith("mcp__github_ci__"),
+    const hasGiteaCITools = allowedToolsList.some((tool) =>
+      tool.startsWith("mcp__gitea_ci__"),
     );
 
     const baseMcpConfig: { mcpServers: Record<string, unknown> } = {
@@ -97,10 +97,10 @@ export async function prepareMcpConfig(
     // - Always in tag mode (for updating Claude comments)
     // - Only with explicit tools in agent mode
     // Uses custom server because it wraps the comment ID in environment variables
-    const shouldIncludeCommentServer = !isAgentMode || hasGitHubCommentTools;
+    const shouldIncludeCommentServer = !isAgentMode || hasGiteaCommentTools;
 
     if (shouldIncludeCommentServer) {
-      baseMcpConfig.mcpServers.github_comment = {
+      baseMcpConfig.mcpServers.gitea_comment = {
         command: "bun",
         args: [
           "run",
