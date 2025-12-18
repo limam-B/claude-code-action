@@ -127,6 +127,9 @@ outputs:
   structured_output:
     description: "JSON string containing all structured output fields when --json-schema is provided in claude_args. Use fromJSON() to parse: fromJSON(steps.id.outputs.structured_output).field_name"
     value: ${{ steps.claude-code.outputs.structured_output }}
+  session_id:
+    description: "The Claude Code session ID that can be used with --resume to continue this conversation"
+    value: ${{ steps.claude-code.outputs.session_id }}
 
 runs:
   using: "composite"
@@ -204,7 +207,7 @@ runs:
 
         # Install Claude Code if no custom executable is provided
         if [ -z "$PATH_TO_CLAUDE_CODE_EXECUTABLE" ]; then
-          CLAUDE_CODE_VERSION="2.0.69"
+          CLAUDE_CODE_VERSION="2.0.72"
           echo "Installing Claude Code v${CLAUDE_CODE_VERSION}..."
           for attempt in 1 2 3; do
             echo "Installation attempt $attempt..."
@@ -254,7 +257,8 @@ runs:
         INPUT_PLUGIN_MARKETPLACES: ${{ inputs.plugin_marketplaces }}
 
         # Model configuration
-        GITHUB_TOKEN: ${{ steps.prepare.outputs.API_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.prepare.outputs.github_token }}
+        GH_TOKEN: ${{ steps.prepare.outputs.github_token }}
         NODE_VERSION: ${{ env.NODE_VERSION }}
         DETAILED_PERMISSION_MESSAGES: "1"
 
@@ -303,7 +307,8 @@ runs:
         PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
         CLAUDE_COMMENT_ID: ${{ steps.prepare.outputs.claude_comment_id }}
         GITHUB_RUN_ID: ${{ github.run_id }}
-        GITHUB_TOKEN: ${{ steps.prepare.outputs.API_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.prepare.outputs.github_token }}
+        GH_TOKEN: ${{ steps.prepare.outputs.github_token }}
         GITHUB_EVENT_NAME: ${{ github.event_name }}
         TRIGGER_COMMENT_ID: ${{ github.event.comment.id }}
         CLAUDE_BRANCH: ${{ steps.prepare.outputs.CLAUDE_BRANCH }}

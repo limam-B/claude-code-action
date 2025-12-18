@@ -82,6 +82,9 @@ outputs:
   structured_output:
     description: "JSON string containing all structured output fields when --json-schema is provided in claude_args (use fromJSON() or jq to parse)"
     value: ${{ steps.run_claude.outputs.structured_output }}
+  session_id:
+    description: "The Claude Code session ID that can be used with --resume to continue this conversation"
+    value: ${{ steps.run_claude.outputs.session_id }}
 
 runs:
   using: "composite"
@@ -121,7 +124,7 @@ runs:
         PATH_TO_CLAUDE_CODE_EXECUTABLE: ${{ inputs.path_to_claude_code_executable }}
       run: |
         if [ -z "$PATH_TO_CLAUDE_CODE_EXECUTABLE" ]; then
-          CLAUDE_CODE_VERSION="2.0.69"
+          CLAUDE_CODE_VERSION="2.0.72"
           echo "Installing Claude Code v${CLAUDE_CODE_VERSION}..."
           for attempt in 1 2 3; do
             echo "Installation attempt $attempt..."
