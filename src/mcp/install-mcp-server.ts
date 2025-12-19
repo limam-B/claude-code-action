@@ -173,7 +173,7 @@ export async function prepareMcpConfig(
     // - In agent mode: same conditions PLUS explicit CI tools in allowedTools
     const hasWorkflowToken = !!process.env.DEFAULT_WORKFLOW_TOKEN;
     const shouldIncludeCIServer =
-      (!isAgentMode || hasGitHubCITools) &&
+      (!isAgentMode || hasGiteaCITools) &&
       isEntityContext(context) &&
       context.isPR &&
       hasWorkflowToken;
