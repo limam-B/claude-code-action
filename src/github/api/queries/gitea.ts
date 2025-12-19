@@ -53,6 +53,18 @@ export async function fetchPullRequestFiles(
 }
 
 /**
+ * Fetch commits in a PR
+ */
+export async function fetchPullRequestCommits(
+  client: GiteaClient,
+  owner: string,
+  repo: string,
+  index: number,
+) {
+  return client.get(`/repos/${owner}/${repo}/pulls/${index}/commits`);
+}
+
+/**
  * Fetch repository details
  */
 export async function fetchRepository(

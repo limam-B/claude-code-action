@@ -51,6 +51,7 @@ export type GitHubReview = {
 };
 
 export type GitHubPullRequest = {
+  number: number;
   title: string;
   body: string;
   author: GitHubAuthor;
@@ -81,6 +82,7 @@ export type GitHubPullRequest = {
 };
 
 export type GitHubIssue = {
+  number: number;
   title: string;
   body: string;
   author: GitHubAuthor;

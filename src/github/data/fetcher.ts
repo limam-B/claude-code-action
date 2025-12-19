@@ -5,6 +5,7 @@ import {
   fetchIssue,
   fetchIssueComments,
   fetchPullRequestFiles,
+  fetchPullRequestCommits,
 } from "../api/queries/gitea";
 import {
   isIssueCommentEvent,
@@ -206,6 +207,12 @@ export async function fetchGitHubData({
         repo,
         parseInt(prNumber),
       );
+      const prCommits = await fetchPullRequestCommits(
+        giteaClient,
+        owner,
+        repo,
+        parseInt(prNumber),
+      );
 
       // Transform Gitea PR response to match GitHub GraphQL structure
       contextData = {
@@ -215,8 +222,28 @@ export async function fetchGitHubData({
         state: pr.state,
         createdAt: pr.created_at,
         updatedAt: pr.updated_at,
+        baseRefName: pr.base?.ref || "main",
+        headRefName: pr.head?.ref || "unknown",
+        headRefOid: pr.head?.sha || "",
+        additions: pr.additions || 0,
+        deletions: pr.deletions || 0,
         author: {
           login: pr.user.login,
+        },
+        commits: {
+          totalCount: Array.isArray(prCommits) ? prCommits.length : 0,
+          nodes: Array.isArray(prCommits)
+            ? prCommits.map((c: any) => ({
+                commit: {
+                  oid: c.sha || c.commit?.sha || "",
+                  message: c.commit?.message || "",
+                  author: {
+                    name: c.commit?.author?.name || "",
+                    email: c.commit?.author?.email || "",
+                  },
+                },
+              }))
+            : [],
         },
         comments: {
           nodes: prComments.map((c: any) => ({
@@ -244,9 +271,12 @@ export async function fetchGitHubData({
                     : "MODIFIED",
           })),
         },
+        reviews: {
+          nodes: [],
+        },
       } as GitHubPullRequest;
 
-      changedFiles = contextData.files.nodes || [];
+      changedFiles = (contextData as GitHubPullRequest).files.nodes || [];
       comments = filterCommentsToTriggerTime(
         contextData.comments?.nodes || [],
         triggerTime,
