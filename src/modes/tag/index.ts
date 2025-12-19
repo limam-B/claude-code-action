@@ -130,7 +130,7 @@ export const tagMode: Mode = {
       "Read",
       "Write",
       // Use custom comment server (wraps comment ID in env vars)
-      "mcp__github_comment__update_claude_comment",
+      "mcp__gitea_comment__update_claude_comment",
       // Official Gitea MCP for file operations
       "mcp__gitea__get_file_content",
       ...userAllowedMCPTools,
@@ -146,6 +146,9 @@ export const tagMode: Mode = {
         "Bash(git diff:*)",
         "Bash(git log:*)",
         "Bash(git rm:*)",
+        "Bash(git rev-parse:*)",
+        "Bash(git show:*)",
+        "Bash(git branch:*)",
       );
     } else {
       // When using commit signing, use Gitea MCP file operations tools

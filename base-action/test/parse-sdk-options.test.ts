@@ -20,7 +20,7 @@ describe("parseSdkOptions", () => {
     test("should extract allowedTools from claudeArgs with MCP tools", () => {
       const options: ClaudeOptions = {
         claudeArgs:
-          '--allowedTools "Edit,Read,mcp__github_comment__update_claude_comment"',
+          '--allowedTools "Edit,Read,mcp__gitea_comment__update_claude_comment"',
       };
 
       const result = parseSdkOptions(options);
@@ -28,7 +28,7 @@ describe("parseSdkOptions", () => {
       expect(result.sdkOptions.allowedTools).toEqual([
         "Edit",
         "Read",
-        "mcp__github_comment__update_claude_comment",
+        "mcp__gitea_comment__update_claude_comment",
       ]);
     });
 
@@ -36,7 +36,7 @@ describe("parseSdkOptions", () => {
       // This simulates tag mode adding its tools, then user adding their own
       const options: ClaudeOptions = {
         claudeArgs:
-          '--allowedTools "Edit,Read,mcp__github_comment__update_claude_comment" --model "claude-3" --allowedTools "Bash(npm install),mcp__github__get_issue"',
+          '--allowedTools "Edit,Read,mcp__gitea_comment__update_claude_comment" --model "claude-3" --allowedTools "Bash(npm install),mcp__github__get_issue"',
       };
 
       const result = parseSdkOptions(options);
@@ -44,7 +44,7 @@ describe("parseSdkOptions", () => {
       expect(result.sdkOptions.allowedTools).toEqual([
         "Edit",
         "Read",
-        "mcp__github_comment__update_claude_comment",
+        "mcp__gitea_comment__update_claude_comment",
         "Bash(npm install)",
         "mcp__github__get_issue",
       ]);
