@@ -131,8 +131,41 @@ export const tagMode: Mode = {
       "Write",
       // Use custom comment server (wraps comment ID in env vars)
       "mcp__gitea_comment__update_claude_comment",
-      // Official Gitea MCP for file operations
+      // Official Gitea MCP - Read-only tools for gathering context
       "mcp__gitea__get_file_content",
+      "mcp__gitea__get_dir_content",
+      "mcp__gitea__get_issue_by_index",
+      "mcp__gitea__get_issue_comments_by_index",
+      "mcp__gitea__get_pull_request_by_index",
+      "mcp__gitea__get_release",
+      "mcp__gitea__get_latest_release",
+      "mcp__gitea__get_tag",
+      "mcp__gitea__get_repo_label",
+      "mcp__gitea__get_wiki_page",
+      "mcp__gitea__get_wiki_revisions",
+      "mcp__gitea__get_my_user_info",
+      "mcp__gitea__get_user_orgs",
+      "mcp__gitea__get_gitea_mcp_server_version",
+      "mcp__gitea__list_branches",
+      "mcp__gitea__list_repo_issues",
+      "mcp__gitea__list_repo_pull_requests",
+      "mcp__gitea__list_repo_commits",
+      "mcp__gitea__list_releases",
+      "mcp__gitea__list_tags",
+      "mcp__gitea__list_repo_labels",
+      "mcp__gitea__list_org_labels",
+      "mcp__gitea__list_wiki_pages",
+      "mcp__gitea__list_my_repos",
+      "mcp__gitea__search_repos",
+      "mcp__gitea__search_users",
+      "mcp__gitea__search_org_teams",
+      // Safe write operations - Labels
+      "mcp__gitea__add_issue_labels",
+      "mcp__gitea__remove_issue_label",
+      "mcp__gitea__replace_issue_labels",
+      "mcp__gitea__clear_issue_labels",
+      // Safe write operations - Comments (for detailed responses)
+      "mcp__gitea__create_issue_comment",
       ...userAllowedMCPTools,
     ];
 
